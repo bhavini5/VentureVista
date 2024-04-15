@@ -1,0 +1,185 @@
+<% layout ("/layouts/boilerplate") %>
+
+<div class="row mt-3">
+    <div class="col-8 offset-2">
+        <h3><%=listing.title%></h3>
+    </div>
+          <div class="card col-6 offset-3 show-card listing-card" >
+            <img src="<%=listing.image.url%>" 
+            class="card-img-top show-img" alt="listing_image" >
+            <div class="card-body">
+              <p class="card-text">
+                <ul>
+                    <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br><br>
+                    &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/night<br>
+                    <%=listing.description%><br>
+                    <%=listing.country%><br>
+                    <%=listing.location%><br>
+
+                </ul>
+              </p>
+            </div>
+            </div>
+            </div>
+            <br>
+            <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
+            <div class="btns">
+                <a class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
+                <form method="post"  action="/listings/<%=listing._id%>/delete?_method=DELETE">
+                <button class="btn btn-dark offset-4">Delete</button>
+                </form>
+              </div>
+              <% }%>
+              <% if(currUser) { %>
+              <div class="col-8 offset-3">
+                <hr>
+                <h4>Leave a Review</h4>
+                <form action="/listings/<%=listing._id%>/reviews" method="POST"
+                  novalidate
+                  class="needs-validation">
+                    <!-- <lable class="form-label" for="rating">Rating</lable>
+                    <input type="range" min="1" max="5" id="rating" name="review[rating]" class="form-range"> -->
+                  <div class="mb-3 mt-3">
+                    <label for="rating" class="form-label">Rating</label>
+
+                  <fieldset class="starability-slot">
+                    <input 
+                          type="radio" 
+                          id="no-rate" 
+                          class="input-no-rate"
+                          name="review[rating]" 
+                          value="1"
+                          checked aria-label="No rating."
+                          />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                  </fieldset>
+                </div>
+                  <div class="mb-3 mt-3">
+                    <lable class="form-label" for="comment">Comments</lable>
+                    <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
+                    <div class="invalid-feedback">
+                      Please submit some comments for reviews
+                    </div>
+                  </div>
+                  <br>
+                  <button class="btn btn-outline-dark">Submit</button>
+                </form>
+                <hr>
+                <% } %>
+              
+           <%if(listing.reviews.length > 0){ %>
+
+<<<<<<< HEAD
+            <div class="row ">
+              <h4>All Reviews</h4>
+               <% for(review of listing.reviews) {%>
+                 <div class="card col-5 ms-3 mb-3">
+                   <div class="card-body" >
+                       <h5 class="card-title">@<%= review.author.username %></h5>
+                       <p class="card-text"><%=review.comment%></p>
+                       <p class="starability-result card-text" data-rating ="<%= review.rating %>"></p>
+                 </div>
+                 <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
+                   <button class="btn btn-sm btn-dark">Delete</button>
+                 </form>
+                 </div><br>
+              <% } %>
+             </div>
+
+            <%}%>
+          </div>
+        </div>
+        <div id="map"></div>
+        <script>
+          let mapToken = "<%= process.env.MAP_TOKEN %>" ;
+          console.log(mapToken);
+          mapboxgl.accessToken = mapToken;
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v9',
+                projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
+                zoom: 1,
+                center: [30, 15]
+            });
+        
+            map.addControl(new mapboxgl.NavigationControl());
+            map.scrollZoom.disable();
+        
+            map.on('style.load', () => {
+                map.setFog({}); // Set the default atmosphere style
+            });
+        
+            // The following values can be changed to control rotation speed:
+        
+            // At low zooms, complete a revolution every two minutes.
+            const secondsPerRevolution = 240;
+            // Above zoom level 5, do not rotate.
+            const maxSpinZoom = 5;
+            // Rotate at intermediate speeds between zoom levels 3 and 5.
+            const slowSpinZoom = 3;
+        
+            let userInteracting = false;
+            const spinEnabled = true;
+        
+            function spinGlobe() {
+                const zoom = map.getZoom();
+                if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
+                    let distancePerSecond = 360 / secondsPerRevolution;
+                    if (zoom > slowSpinZoom) {
+                        // Slow spinning at higher zooms
+                        const zoomDif =
+                            (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
+                        distancePerSecond *= zoomDif;
+                    }
+                    const center = map.getCenter();
+                    center.lng -= distancePerSecond;
+                    // Smoothly animate the map over one second.
+                    // When this animation is complete, it calls a 'moveend' event.
+                    map.easeTo({ center, duration: 1000, easing: (n) => n });
+                }
+            }
+        
+            // Pause spinning on interaction
+            map.on('mousedown', () => {
+                userInteracting = true;
+            });
+            map.on('dragstart', () => {
+                userInteracting = true;
+            });
+        
+            // When animation is complete, start spinning if there is no ongoing interaction
+            map.on('moveend', () => {
+                spinGlobe();
+            });
+        
+            spinGlobe();
+              </script>
+=======
+             <h4>All Reviews</h4>
+             <div class="row ">
+              <% for(review of listing.reviews) {%>
+                <div class="card col-5 ms-3 mb-3">
+                  <div class="card-body" >
+                      <h5 class="card-title">@<%= review.author.username %></h5>
+                      <p class="card-text"><%=review.comment%></p>
+                      <p class="card-text"><%=review.rating%> stars</p>
+                </div>
+                <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
+                  <button class="btn btn-sm btn-dark">Delete</button>
+                </form>
+                </div><br>
+             <% } %>
+            </div>
+              </div>
+>>>>>>> e23afa1553630e9690b3cca228d860ecece884d3
+              
+    
