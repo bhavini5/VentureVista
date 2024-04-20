@@ -3,6 +3,7 @@ const Schema = mongoose.Schema;
 const User = require("./user.js");
 const Review = require("./review");
 
+
 const listingSchema = new Schema({
     title: {
         type: String,
@@ -12,10 +13,9 @@ const listingSchema = new Schema({
         type: String,
         required: true
     },
-    image: {
-        url:String,
-        filename:String,
-    },
+    image: [{
+        type:String
+    }],
     price: {
         type: Number,
         required: true
@@ -24,7 +24,7 @@ const listingSchema = new Schema({
         type: String,
         required: true
     },
-    country: {
+    address: {
         type: String,
         required: true
     },
@@ -35,7 +35,31 @@ const listingSchema = new Schema({
     owner: {
         type: Schema.Types.ObjectId,
         ref: "User"
-    }
+    },
+    geometry: {
+        type: {
+          type: String, // Don't do `{ location: { type: String } }`
+          enum: ['Point'], // 'location.type' must be 'Point'
+          required: true
+        },
+    coordinates: {
+          type: [Number],
+          required: true
+        }
+      },
+      category:{
+        type:String,
+        enum :[
+            "1 BHK",
+            "2 BHK",
+            "3 BHK"
+        ]
+      },
+      contact: {
+        type: String,
+        unique: [true, "Phone number is already in use."]
+      },
+  
 });
 
 // Mongoose middleware: If a listing is deleted, delete associated reviews

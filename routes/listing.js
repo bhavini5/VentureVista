@@ -5,15 +5,23 @@ const Listing = require("../models/listing.js");
 const User = require("../models/user.js");
 const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
 const { authorize } = require("passport");
+const upload = require('../multer.js')
+
+const mbxgeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
+const mapToken = process.env.MAP_TOKEN;
+const geocodingClient = mbxgeocoding({ accessToken: mapToken });
+
 
 // const {storage} = require("../CloudConfig.js")
-const multer = require('multer');
+
+
 // const upload = multer({storage});
 // const fetch = require('node-fetch');
 
 // Index route
 router.get("/", async (req, res) => {
     const allListings = await Listing.find({})
+    // console.log(allListings)
     res.render("listings/index.ejs", { allListings });
 });
 
@@ -24,26 +32,38 @@ router.get("/new", isLoggedIn, (req, res) => {
 });
 
 
-router.post("/",
-            isLoggedIn, 
-            validateListing,
-            // upload.single("listing[image]") , 
-            wrapAsync(async (req, res, next) => {
+router.post("/upload",
+    isLoggedIn,
+    // validateListing,
+    upload.array("listing[image]",5), // Handle multiple file uploads
+    wrapAsync(async (req, res, next) => {
+       
+        // console.log(req.file);
+        let response = await geocodingClient.forwardGeocode({
+            query: req.body.listing.location,
+            limit: 1,   //number if coordinates that will return 
+          })
+        .send();
     try {
-        
-        let url=req.file.path;
-        let filename=req.file.filename;
-        console.log(url , " " , filename);
-        // const newListing = new Listing(req.body.listing);
-        // newListing.owner=req.user._id;
-        // newListing.image={url,filename};
-        // await newListing.save();
-        req.flash("success","New Listing Created");
+        console.log(req.file);
+        // After the files are uploaded, req.files contains the uploaded file details
+        let uploadedFiles = req.files;
+        let filenames = uploadedFiles.map(file => file.filename);
+        // console.log(req.file);
+        // console.log(url, filename);
+
+        const newListing = new Listing(req.body.listing);
+        newListing.owner=req.user._id;
+        newListing.image=filenames;
+        newListing.geometry=response.body.features[0].geometry;
+        let savedListing = await newListing.save();
+        console.log(savedListing);
         res.redirect("/listings");
     } catch (err) {
         next(err); // Pass the error to Express's error handling middleware
     }
 }));
+
 
 // Show Route
 router.get("/:id",isLoggedIn, async (req, res) => {
@@ -75,10 +95,18 @@ router.get("/:id/edit",isOwner, async (req, res) => {
 router.put("/:id",
         isLoggedIn,
         isOwner,
+        upload.single("listing[image]"),
         validateListing,
         wrapAsync( async (req, res) => {
     let { id } = req.params;
-    await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+    let listing = await Listing.findByIdAndUpdate(id, { ...req.body.listing });
+
+   if( typeof  req.file !== "undefined"){
+    let url = req.file.path;
+    let filename = req.file.filename;
+    listing.image=filename;
+    await listing.save();
+   }
     req.flash("success","Listing Updated");
     res.redirect(`/listings/${id}`);
 }));
@@ -91,5 +119,23 @@ router.delete("/:id/delete",isLoggedIn,isOwner, async (req, res) => {
 
     res.redirect("/listings");
 });
+
+router.get("/search/:key", async (req, res) => {
+    try {
+        const keyy = req.params.key; // Get the search key from query parameters
+        const data = await Listing.find({
+            "$or": [
+                { location: { $regex: keyy } }, // Case-insensitive search
+                { address: { $regex: keyy} }
+            ]
+        });
+        console.log(data);
+        res.render("listings/index.ejs", { allListings: data }); // Render the template with search results
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 module.exports = router;

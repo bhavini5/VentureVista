@@ -4,8 +4,8 @@
         <div class="col-8 offset-2">
             <br><br>
             <h3>Edit  listing</h3>
-    <form method="POST" action="/listings/<%=listing._id%>?_method=PUT" novalidate class="needs-validation">
-        <div class="mb-3">
+            <form method="POST" action="/listings/<%=listing._id%>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+          <div class="mb-3">
             <lable for="title"class="form-label">Title</lable>
             <input name="listing[title]" value="<%=listing.title%>" type="text" class="form-control" required>
             <div class="invalid-feedback">Please fill the required field!</div>
@@ -18,11 +18,13 @@
             <div class="invalid-feedback">Please fill the required field!</div>
 
         </div>
-        
+        <div class="mb-3 ">
+            Original Listing Image <br>
+            <img style="border-radius: 0.5rem; height: 7rem;" src="/uploads/<%= listing.image %>">
+        </div>
         <div class="mb-3">
-            <lable for="image"class="form-label">Image Link</lable>
-            <input name="listing[image]" value="<%=listing.image%>"  type="text"class="form-control" required>
-            <div class="invalid-feedback">Please fill the required field!</div>
+            <lable for="image"class="form-label">Upload New Image</lable>
+            <input name="listing[image]" type="file" class="form-control" >
 
         </div>
 
@@ -34,18 +36,19 @@
 
             </div>
     
+
+          
             <div class="mb-3 col-md-8">
                 <lable for="country"class="form-label">Country</lable>
-                <input name="listing[country]" value="<%=listing.country%>" type="text" class="form-control" required>
+                <input name="listing[country]" value="<%=listing.country%>" type="text" class="form-control" readonly>
             <div class="invalid-feedback">Please fill the required field!</div>
-
             </div>
             
         </div>
         
         <div class="mb-3">
             <lable for="location"class="form-label">Location</lable>
-            <input name="listing[location]" value="<%=listing.location%>" type="text" class="form-control" required>
+            <input name="listing[location]" value="<%=listing.location%>" type="text" class="form-control" readonly>
             <div class="invalid-feedback">Please fill the required field!</div>
 
         </div>

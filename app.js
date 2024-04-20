@@ -47,7 +47,7 @@ app.use(express.urlencoded({extended:true}));
 app.use(methodOverride("_method"));
 app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"public")));
-
+app.use('/uploads', express.static('uploads'));
 const sessionOptions= {
     secret: "B!@E#TSP*H",
     resave: false,
@@ -89,10 +89,10 @@ passport.deserializeUser(User.deserializeUser()); //generates function that is u
 // })
 
 
-app.get("/", (req, res) => {
-    console.dir(req.cookies);
-    res.send("hi i am root");
-});
+// app.get("/", (req, res) => {
+//     console.dir(req.cookies);
+//     res.send("hi i am root");
+// });
 
 
 app.use((req,res,next)=>{
@@ -107,6 +107,8 @@ app.use("/",userRouter)
 
 //reviews
 //post-route
+
+
 
 app.use((err, req, res, next) => {
     let { statusCode =500,message ="something went wrong" } = err;

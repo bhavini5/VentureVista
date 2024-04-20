@@ -1,20 +1,48 @@
 <% layout ("/layouts/boilerplate") %>
-
+<script>
+const mapToken =  "<%= process.env.Map_Token %>";
+const listing =  <%-JSON.stringify(listing) %>;
+</script>
 <div class="row mt-3">
     <div class="col-8 offset-2">
-        <h3><%=listing.title%></h3>
+        
     </div>
+    
           <div class="card col-6 offset-3 show-card listing-card" >
-            <img src="<%=listing.image.url%>" 
-            class="card-img-top show-img" alt="listing_image" >
+            <h3><%=listing.title%></h3>
+            <div class="row">
+              <div class="col">
+                <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+                  <div class="carousel-inner">
+                    <% let isFirst = true; %>
+                    <% for (let image of listing.image) { %>
+                      <div class="carousel-item <%= isFirst ? 'active' : '' %>">
+                        <img  style="height: 25rem; width: 8rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image">
+                      </div>
+                      <% isFirst = false; %>
+                    <% } %>
+                  </div>
+                  <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                  </button>
+                  <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
             <div class="card-body">
               <p class="card-text">
                 <ul>
-                    <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br><br>
-                    &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/night<br>
+                    <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br>
+                    <b>Contact:</b> <i> <%= listing.contact %> </i><br><br>
+                    &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
                     <%=listing.description%><br>
-                    <%=listing.country%><br>
-                    <%=listing.location%><br>
+                   <b>Location:</b> <%=listing.address%>/
+                    <%=listing.location%><br> 
 
                 </ul>
               </p>
@@ -30,9 +58,11 @@
                 </form>
               </div>
               <% }%>
+              <br>
               <% if(currUser) { %>
+              
               <div class="col-8 offset-3">
-                <hr>
+                <!-- <hr> -->
                 <h4>Leave a Review</h4>
                 <form action="/listings/<%=listing._id%>/reviews" method="POST"
                   novalidate
@@ -78,108 +108,34 @@
               
            <%if(listing.reviews.length > 0){ %>
 
-<<<<<<< HEAD
             <div class="row ">
               <h4>All Reviews</h4>
                <% for(review of listing.reviews) {%>
                  <div class="card col-5 ms-3 mb-3">
-                   <div class="card-body" >
+                   <div class="card-body" style="padding: 1rem;" >
                        <h5 class="card-title">@<%= review.author.username %></h5>
                        <p class="card-text"><%=review.comment%></p>
                        <p class="starability-result card-text" data-rating ="<%= review.rating %>"></p>
                  </div>
+                 <% if(currUser && review.author._id.equals(currUser._id)) { %>
                  <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
                    <button class="btn btn-sm btn-dark">Delete</button>
                  </form>
+                 <% }%>
                  </div><br>
               <% } %>
              </div>
 
             <%}%>
           </div>
-        </div>
-        <div id="map"></div>
-        <script>
-          let mapToken = "<%= process.env.MAP_TOKEN %>" ;
-          console.log(mapToken);
-          mapboxgl.accessToken = mapToken;
-            const map = new mapboxgl.Map({
-                container: 'map',
-                style: 'mapbox://styles/mapbox/streets-v9',
-                projection: 'globe', // Display the map as a globe, since satellite-v9 defaults to Mercator
-                zoom: 1,
-                center: [30, 15]
-            });
+        <!-- </div> -->
         
-            map.addControl(new mapboxgl.NavigationControl());
-            map.scrollZoom.disable();
-        
-            map.on('style.load', () => {
-                map.setFog({}); // Set the default atmosphere style
-            });
-        
-            // The following values can be changed to control rotation speed:
-        
-            // At low zooms, complete a revolution every two minutes.
-            const secondsPerRevolution = 240;
-            // Above zoom level 5, do not rotate.
-            const maxSpinZoom = 5;
-            // Rotate at intermediate speeds between zoom levels 3 and 5.
-            const slowSpinZoom = 3;
-        
-            let userInteracting = false;
-            const spinEnabled = true;
-        
-            function spinGlobe() {
-                const zoom = map.getZoom();
-                if (spinEnabled && !userInteracting && zoom < maxSpinZoom) {
-                    let distancePerSecond = 360 / secondsPerRevolution;
-                    if (zoom > slowSpinZoom) {
-                        // Slow spinning at higher zooms
-                        const zoomDif =
-                            (maxSpinZoom - zoom) / (maxSpinZoom - slowSpinZoom);
-                        distancePerSecond *= zoomDif;
-                    }
-                    const center = map.getCenter();
-                    center.lng -= distancePerSecond;
-                    // Smoothly animate the map over one second.
-                    // When this animation is complete, it calls a 'moveend' event.
-                    map.easeTo({ center, duration: 1000, easing: (n) => n });
-                }
-            }
-        
-            // Pause spinning on interaction
-            map.on('mousedown', () => {
-                userInteracting = true;
-            });
-            map.on('dragstart', () => {
-                userInteracting = true;
-            });
-        
-            // When animation is complete, start spinning if there is no ongoing interaction
-            map.on('moveend', () => {
-                spinGlobe();
-            });
-        
-            spinGlobe();
-              </script>
-=======
-             <h4>All Reviews</h4>
-             <div class="row ">
-              <% for(review of listing.reviews) {%>
-                <div class="card col-5 ms-3 mb-3">
-                  <div class="card-body" >
-                      <h5 class="card-title">@<%= review.author.username %></h5>
-                      <p class="card-text"><%=review.comment%></p>
-                      <p class="card-text"><%=review.rating%> stars</p>
-                </div>
-                <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
-                  <button class="btn btn-sm btn-dark">Delete</button>
-                </form>
-                </div><br>
-             <% } %>
+            
+            <div class="col-8 offset-3 mb-3">
+              <h3>Where you'll be</h3>
+              <div id="map"></div>
             </div>
-              </div>
->>>>>>> e23afa1553630e9690b3cca228d860ecece884d3
+          </div>
+          <script src="/js/map.js" ></script>
               
     
