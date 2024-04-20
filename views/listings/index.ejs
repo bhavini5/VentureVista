@@ -22,13 +22,14 @@
     display: none;
   }
   .tax-toggle {
-    border : 1px solid black;
+    border: 1px solid black;
     border-radius: 1rem;
-    height:3.5rem;
+    height: 2.5rem;
     padding: 1rem;
-    margin-left: 2rem;
+    margin-left: 51rem;
     display: flex;
     align-items: center;
+    width: 19rem;
   }
   .carousel {
     cursor: none; /* Hide the cursor */
@@ -39,7 +40,7 @@
     <!-- <form method="get" action="/listings/new">
       <button>Create a new Listing</button>
     </form> -->
-    <div id="filters">
+    <!-- <div id="filters">
       <div class="filter">
         <div><i class="fa-solid fa-fire"></i></div>
         <p>Trending</p>
@@ -80,19 +81,35 @@
         <div><i class="fa-solid fa-water"></i></div>
         <p>River By</p>
       </div>
+       -->
+       <div class="rowA" style="margin-top: 2rem;">
+        <div style="width: 11rem; margin-left: 38rem; ">
+          <lable for="category"class="form-label">Sort By</lable><br>
+          <!-- <input type="hidden" name="" id="selectedCategory"> -->
+          <select style="border: 1px solid black; border-radius: 1rem;"  name="listing[category]" class="form-control">
+          <option title="Mountain Majesty">Inc Price</option>
+          <option title="Farms">Dec Price</option>
+          <!-- <option title="Riverside Retreat">3 BHK</option> -->
+  
+        <div class="invalid-feedback">Please fill the required filled</div>
+        </select>
+        
+      </div>
       
-      <div class="tax-toggle">
-        <div class="form-check-reverse form-switch">
-          <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-          <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+  
+        <div style="margin-top: -2.5rem;" class="tax-toggle">
+          <div class="form-check-reverse form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+            <label  class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1">
+       </div>
+    <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1 ml-4" style="margin-left: 4rem; margin-bottom:6rem ;">
       <%for(let listing of allListings){ %>
         <a href="/listings/<%=listing._id%>" class="listing-link">
         <div class="card col listing-card" >
-          <div class="row">
+          <div class="row" >
             <div class="col">
               <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" style="cursor: none;">
 
@@ -100,7 +117,7 @@
                   <% let isFirst = true; %>
                   <% for (let image of listing.image) { %>
                     <div class="carousel-item <%= isFirst ? 'active' : '' %>">
-                      <img  style="height: 15rem; width: 8rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image">
+                      <img  style="height: 20rem; width: 9rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image">
                     </div>
                     <% isFirst = false; %>
                   <% } %>
