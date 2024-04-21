@@ -14,6 +14,6 @@ const marker = new mapboxgl.Marker({ color: "red" })
 .setPopup(new mapboxgl.Popup({offset : 25})
 .setHTML (
   
-` <h6> ${listing.location} </h6><p> Exact Location provided after booking </p> `
+` <h6> ${listing.location} </h6><p> For inquiries, contact us at ${listing.contact} </p> `
 ))
 .addTo(map);
