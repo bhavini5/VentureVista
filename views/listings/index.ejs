@@ -86,13 +86,16 @@
         <div style="width: 11rem; margin-left: 38rem; ">
           <lable for="category"class="form-label">Sort By</lable><br>
           <!-- <input type="hidden" name="" id="selectedCategory"> -->
-          <select style="border: 1px solid black; border-radius: 1rem;"  name="listing[category]" class="form-control">
-          <option title="Mountain Majesty">Inc Price</option>
-          <option title="Farms">Dec Price</option>
-          <!-- <option title="Riverside Retreat">3 BHK</option> -->
-  
-        <div class="invalid-feedback">Please fill the required filled</div>
-        </select>
+          <form id="sortForm" class="d-flex" method="GET" action="/listings/sort/:sortBy">
+
+            <select name="sortBy" id="sortBy" class="form-control">
+                <option value="inc-price">Inc Price</option>
+                <option value="dec-price">Dec Price</option>
+            </select>
+            <button type="submit">Sort</button>
+        </form>
+        
+        
         
       </div>
       
@@ -105,7 +108,7 @@
         </div>
       </div>
        </div>
-    <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1 ml-4" style="margin-left: 4rem; margin-bottom:6rem ;">
+    <div class="row row-cols-lg-3 row-cols-md-3 row-cols-sm-1 ml-4" style="margin-left: 4rem; margin-bottom:6rem ;margin-top: 4rem;">
       <%for(let listing of allListings){ %>
         <a href="/listings/<%=listing._id%>" class="listing-link">
         <div class="card col listing-card" >
@@ -164,4 +167,39 @@
       }
     }
   })
+  const sortForm = document.getElementById('sortForm');
+const sortBySelect = document.getElementById('sortBy');
+
+sortForm.addEventListener('submit', (event) => {
+    event.preventDefault(); // Prevent default form submission
+    
+    // Get the selected sorting criteria from the dropdown menu
+    const sortByValue = sortBySelect.value;
+    
+    // Construct the URL with the selected sorting criteria
+    const actionUrl = `/listings/sort/${sortByValue}`;
+    
+    // Set the form action to the constructed URL
+    sortForm.action = actionUrl;
+    
+    // Submit the form
+    sortForm.submit();
+});
+
+
+    // document.getElementById('sortForm').addEventListener('submit', function(event) {
+    //     event.preventDefault(); // Prevent the default form submission
+        
+    //     // Get the selected sorting criteria from the dropdown menu
+    //     const sortBy = document.getElementById('sortBy').value;
+        
+    //     // Construct the URL with the selected sorting criteria
+    //     const actionUrl = `/listings/sort/sortBy=${sortBy}`;
+        
+    //     // Set the form action to the constructed URL
+    //     document.getElementById('sortForm').action = actionUrl;
+        
+    //     // Submit the form
+    //     this.submit();
+    // });
 </script>

@@ -122,20 +122,46 @@ router.delete("/:id/delete",isLoggedIn,isOwner, async (req, res) => {
 
 router.get("/search/:key", async (req, res) => {
     try {
-        const keyy = req.params.key; // Get the search key from query parameters
+        const { key } = req.params;
+
+        // Use regular expressions with the 'i' flag for case sensitivity
         const data = await Listing.find({
             "$or": [
-                { location: { $regex: keyy } }, // Case-insensitive search
-                { address: { $regex: keyy} }
+                { location: { $regex: key, $options: 'i' } }, // Case-sensitive search
+                { address: { $regex: key, $options: 'i' } }
             ]
         });
+
         console.log(data);
-        res.render("listings/index.ejs", { allListings: data }); // Render the template with search results
+        res.render("listings/index.ejs", { allListings: data });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 });
+router.get("/sort/:sortBy", async (req, res) => {
+    try {
+        const { sortBy } = req.params;
+        // console.log(sortBy); 
+        let sortCriteria;
+        if (sortBy === 'inc-price') {
+            sortCriteria = { price: 1 }; // Sort by price in ascending order
+        } else if (sortBy === 'dec-price') {
+            sortCriteria = { price: -1 }; // Sort by price in descending order
+        } else {
+            // Handle invalid sortBy parameter
+            return res.status(400).send('Invalid sort criteria');
+        }
+
+        const data = await Listing.find().sort(sortCriteria);
+        console.log(data);
+        res.render("listings/index.ejs", { allListings: data });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
 
 
 module.exports = router;

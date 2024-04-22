@@ -27,6 +27,7 @@ const upload=multer({dest:'uploads/'});
 const listingsRouter= require("./routes/listing.js");
 const reviewsRouter= require("./routes/review.js");
 const userRouter= require("./routes/user.js");
+const Listing = require("./models/listing.js");
 
 
 
@@ -37,12 +38,31 @@ async function main() {
     try {
         await mongoose.connect(dbUrl);
         console.log("Connected to MongoDB");
+        // getDatafromdatabase();
+
     } catch (error) {
         console.error("Error connecting to MongoDB:", error);
         process.exit(1); // Exit the process if unable to connect to MongoDB
     }
 }
+
 main(); 
+// async function functionName() {
+//     // Asynchronous code here
+//     // You can use await to pause execution until a promise is resolved
+// }
+
+// async (req, res) => {
+//     const allListings = await Listing.find({})
+//     // console.log(allListings)
+//     res.render("listings/index.ejs", { allListings });
+// };
+
+// async function getDatafromdatabase()
+// {
+//     let listing = await Listing.find({});
+//     console.log(listing);
+// }
 
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname, "views"));
