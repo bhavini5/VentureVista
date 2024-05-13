@@ -148,7 +148,8 @@
        <div class="row row-cols-lg-4 row-cols-md-4 row-cols-sm-1 ml-4" style="margin-left: 1rem; margin-bottom:6rem ;margin-top: 4rem;">
 
       <%for(let listing of allListings){ %>
-        <a href="/listings/<%=listing._id%>" class="listing-link">
+        
+        <a href="/listings/<%=listing._id%>/requested" class="listing-link">
         <div class="card col listing-card" >
           <div class="row" >
             <div class="col">
@@ -158,7 +159,7 @@
                   <% let isFirst = true; %>
                   <% for (let image of listing.image) { %>
                     <div class="carousel-item <%= isFirst ? 'active' : '' %>">
-                      <img  style="height: 20rem; width: 9rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image" aria-disabled="true">
+                      <img  style="height: 20rem; width: 9rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image">
                       <% if(listing.AcceptStatus === 1){%>
                         <div class="alert alert-success" role="alert">
                           Sold Out

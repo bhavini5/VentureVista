@@ -6,6 +6,7 @@ const ExpressError = require("../utils/ExpressError.js");
 const User= require("../models/user.js");
 const passport = require("passport");
 const {saveRedirectUrl}=require("../middleware.js")
+const Listing = require("../models/listing.js");
 
 router.get("/signup",(req,res)=>{
     res.render("users/signup.ejs");
@@ -55,5 +56,67 @@ router.post("/login",saveRedirectUrl,
             res.redirect("/listings");
         }  )   
     })
+
+
+    router.get("/my_properties", async (req, res) => {
+        try {
+            const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
+            // console.log(currUser);
+            if (!currUser) {
+                return res.status(403).send('User not authenticated');
+            }
+    
+            const data = await Listing.find({ owner: currUser._id });
+            if(data.length){
+                res.render("listings/index.ejs", { allListings: data });
+            }
+            else{
+                req.flash("error","You have no Property listed");
+               res.redirect("/listings")
+    
+    
+            }
+        } catch (error) {
+            console.error("Error fetching user properties:", error);
+            res.status(500).send("Internal Server Error");
+        }
+    });
+
+router.get("/requested/properties",async(req,res)=>{
+    try {
+        const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
+        // console.log(currUser);
+        if (!currUser) {
+            return res.status(403).send('User not authenticated');
+        }
+
+        const data = await Listing.find({ owner: currUser._id,AcceptStatus:0 });
+        if(data.length){
+            res.render("listings/Requestedindex.ejs", { allListings: data });
+        }
+        else{
+            req.flash("error","You have no Requested listing");
+           res.redirect("/listings")
+
+
+        }
+    } catch (error) {
+        console.error("Error fetching user properties:", error);
+        res.status(500).send("Internal Server Error");
+    }
+})
+router.get("/approved-listings",async(req,res)=>{
+    const currUser = req.user;
+    const data = await Listing.find({ owner: currUser._id,AcceptStatus:1 });
+        if(data.length){
+            res.render("listings/Requestedindex.ejs", { allListings: data });
+        }
+        else{
+            req.flash("error","No approved Properties");
+           res.redirect("/listings")
+
+
+        }
+})
 
 module.exports=router;

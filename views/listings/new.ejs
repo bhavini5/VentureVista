@@ -31,18 +31,25 @@
             <div class="invalid-feedback">Please fill the required filled</div>
 
             </div>
-            <div class="mb-3 col-md-8">
+            <div class="mb-3 col-md-4">
                 <lable for="location"class="form-label">Location</lable>
                 <input name="listing[location]" placeholder="Jaipur,Rajasthan" type="text" class="form-control" required>
                 <div class="invalid-feedback">Please fill the required filled</div>
     
             </div>
+            <div class="mb-3 col-md-4">
+                <lable for="location"class="form-label">Country</lable>
+                <input name="listing[country]" placeholder="India" type="text" class="form-control" required>
+                <div class="invalid-feedback">Please fill the required filled</div>
     
-            <div class="mb-3 md-8 ">
-                <lable for="contact"class="form-label">Phone Number</lable>
-                <input name="listing[contact]" pattern="[0-9]{10}" placeholder="Enter phone number (e.g., +1234567890)" type="number" class="form-control" required>
-                <div class="invalid-feedback" id="phoneErrorMessage">Please enter a valid 10-digit phone number</div>
             </div>
+    
+            <div class="mb-3">
+                <label for="contact" class="form-label">Phone Number</label>
+                <input name="listing[contact]" type="text" class="form-control" id="contact" placeholder="Enter phone number (e.g., +1234567890)" required>
+                <div class="invalid-feedback" id="phoneErrorMessage">Please enter a valid phone number</div>
+            </div>
+            
             
         </div>
         
@@ -51,20 +58,31 @@
             <input name="listing[address]" placeholder="# 54-B Vasant Vihar, New Delhi" type="text" class="form-control" required>
         <div class="invalid-feedback">Please fill the required filled</div>
         </div>
-
-        <div class="mb-3">
-            <lable for="category"class="form-label">Category</lable><br>
-            <!-- <input type="hidden" name="" id="selectedCategory"> -->
-            <select name="listing[category]" class="form-control">
-            <option title="Mountain Majesty">1 BHK</option>
-            <option title="Farms">2 BHK</option>
-            <option title="Riverside Retreat">3 BHK</option>
-
+        <div class="row">
+            <div class="mb-3 col-md-4">
+                <label for="category" class="form-label">Category</label><br>
+                <select name="listing[category]" class="form-control">
+                    <option value="Sell">Sell</option>
+                    <option value="Rental">Rental</option>
+                </select>
+                <div class="invalid-feedback">Please select a category.</div>
+            </div>
+            
+            <div class="mb-3 col-md-4">
+                <label for="type" class="form-label">Type</label><br>
+                <select name="listing[type]" class="form-control">
+                    <option value="House">House</option>
+                    <option value="Villa">Villa</option>
+                    <option value="Flat">Flat</option>
+                    <option value="Shop">Shop</option>
+                </select>
+                <div class="invalid-feedback">Please select a type.</div>
+            </div>
           <div class="invalid-feedback">Please fill the required filled</div>
           </select>
           
         </div>
-        
+        </div></div>
 
         <!-- <div class="dropdown">
             <lable for="category"class="form-label">Category</lable><br>
@@ -84,7 +102,7 @@
             </ul>
         </div> -->
         <br>
-        <button class="btn btn-dark add-btn">Add</button>
+        <button style="margin-left: 14rem;" class="btn btn-dark add-btn">Add</button>
         
         <br><br>
     </form>
@@ -101,13 +119,34 @@
     });
 });
 
-    document.getElementById('contact').addEventListener('input', function(event) {
-        if (event.target.validity.patternMismatch) {
-            document.getElementById('phoneErrorMessage').style.display = 'block';
+$(document).ready(function() {
+    $('#contact').on('input', function() {
+        var phoneNumber = $(this).val();
+        var isValidPhoneNumber = /^\+?\d{10,14}$/.test(phoneNumber); // Adjust regex pattern as needed
+
+        if (isValidPhoneNumber) {
+            $(this).removeClass('is-invalid');
+            $('#phoneErrorMessage').hide();
         } else {
-            document.getElementById('phoneErrorMessage').style.display = 'none';
+            $(this).addClass('is-invalid');
+            $('#phoneErrorMessage').show();
         }
     });
+});
+// Example client-side form validation using plain JavaScript
+document.querySelector('form').addEventListener('submit', function(event) {
+    const categorySelect = document.querySelector('select[name="category"]');
+    const selectedCategory = categorySelect.value;
+
+    if (!selectedCategory) {
+        event.preventDefault(); // Prevent form submission
+        categorySelect.classList.add('is-invalid'); // Display validation error
+        return;
+    }
+
+    // Clear validation error if category is selected
+    categorySelect.classList.remove('is-invalid');
+});
 
     </script>
 </body>

@@ -1,0 +1,106 @@
+<% layout ("/layouts/boilerplate") %> 
+<style>
+  #filters{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .filter{
+    text-align: center;
+    margin-right: 2rem;
+    margin-top: 2rem;
+    opacity: 0.7;
+  }
+  .filter:hover{
+    opacity: 1;
+    cursor: pointer;
+  }
+  .filter p{
+    font-size: 0.8 rem;;
+  }
+  .taxInfo{
+    display: none;
+  }
+  .tax-toggle {
+    border: 1px solid black;
+    border-radius: 1rem;
+    height: 2.5rem;
+    padding: 1rem;
+    margin-left: 51rem;
+    display: flex;
+    align-items: center;
+    width: 19rem;
+  }
+  .carousel {
+    cursor: none; /* Hide the cursor */
+  }
+</style>
+  <body>
+    <!-- <h3>All Listings</h3> -->
+    <!-- <form method="get" action="/listings/new">
+      <button>Create a new Listing</button>
+    </form> -->
+    <!-- <div id="filters">
+      <div class="filter">
+        <div><i class="fa-solid fa-fire"></i></div>
+        <p>Trending</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-bed"></i></div>
+        <p>Rooms</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-mountain-city"></i></i></div>
+        <p>Iconic cities</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-mountain"></i></div>
+        <p>Mountains</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-brands fa-fort-awesome"></i></div>
+        <p>Castles</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-person-swimming"></i></div>
+        <p>Amazing Pools</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-campground"></i></div>
+        <p>Camping</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-tractor"></i></div>
+        <p>Farms</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-snowflake"></i></div>
+        <p>Arctic</p>
+      </div>
+      <div class="filter">
+        <div><i class="fa-solid fa-water"></i></div>
+        <p>River By</p>
+      </div>
+       -->
+       <div class="rowA" >
+        <div style="width: 11rem; margin-left: 38rem; ">
+          <lable for="category"class="form-label">Sort By</lable><br>
+          <!-- <input type="hidden" name="" id="selectedCategory"> -->
+          <form id="sortForm" class="d-flex" method="GET" action="/listings/sort/:sortBy">
+
+            <select style="border: 1.5px solid black;margin-right: -1rem;border-radius: 2rem;width: 22rem;padding-left: 1.5rem;" name="sortBy" id="sortBy" class="form-control">
+                <option value="inc-price">Inc Price</option>
+                <option value="dec-price">Dec Price</option>
+            </select>
+            <button style="    border-radius: 3rem;background: white;width: 16rem;margin-left: 2rem;" type="submit">Sort</button>
+        </form>
+        
+        
+        
+      </div>
+      <div>
+        <h3>We can't find any listing related to your search!</h3>
+      </div>
+    
+  </body>
+

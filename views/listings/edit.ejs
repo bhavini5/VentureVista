@@ -22,9 +22,8 @@
             Original Listing Image <br>
             
                 <% for (let image of listing.image) { %>
-                    <img  style="height: 25rem; width: 8rem; border-radius: 2rem;" src="/uploads/<%= image %>" class="d-block w-100" alt="listing_image">
+                    <img  style="border-radius: 0.5rem; height: 7rem;" src="/uploads/<%= image %>" alt="listing_image">
                 <% } %>
-            <img style="border-radius: 0.5rem; height: 7rem;" src="/uploads/<%= listing.image %>">
         </div>
         <div class="mb-3">
             <lable for="image"class="form-label">Upload New Image</lable>

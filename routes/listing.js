@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
-const User = require("../models/user.js");
 const {isLoggedIn,isOwner,validateListing}=require("../middleware.js");
 const { authorize } = require("passport");
 const upload = require('../multer.js')
@@ -11,12 +10,8 @@ const mbxgeocoding = require('@mapbox/mapbox-sdk/services/geocoding');
 const mapToken = process.env.MAP_TOKEN;
 const geocodingClient = mbxgeocoding({ accessToken: mapToken });
 
+const User= require("../models/user.js");
 
-// const {storage} = require("../CloudConfig.js")
-
-
-// const upload = multer({storage});
-// const fetch = require('node-fetch');
 
 // Index route
 router.get("/", async (req, res) => {
@@ -45,19 +40,18 @@ router.post("/upload",
           })
         .send();
     try {
-        console.log(req.file);
-        // After the files are uploaded, req.files contains the uploaded file details
         let uploadedFiles = req.files;
         let filenames = uploadedFiles.map(file => file.filename);
         // console.log(req.file);
         // console.log(url, filename);
 
         const newListing = new Listing(req.body.listing);
+        console.log(newListing.category);
         newListing.owner=req.user._id;
         newListing.image=filenames;
         newListing.geometry=response.body.features[0].geometry;
         let savedListing = await newListing.save();
-        console.log(savedListing);
+        // console.log(savedListing);
         res.redirect("/listings");
     } catch (err) {
         next(err); // Pass the error to Express's error handling middleware
@@ -71,11 +65,13 @@ router.get("/:id",isLoggedIn, async (req, res) => {
     let { id } = req.params;
     const listing = await Listing.findById(id)
     .populate({
-        path:"reviews",
-        populate:{
-            path:"author",   //here we are doing nested populate
-            },
-        }).populate("owner");
+        path: "RequestedBy.userId", // Populate the requestedBy field
+        model: "User" // Reference the User model
+    })
+    
+    .populate("reviews")
+    .populate("owner");
+    console.log(listing);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings"); // Add return statement here
@@ -83,6 +79,27 @@ router.get("/:id",isLoggedIn, async (req, res) => {
     
     res.render("listings/show.ejs", { listing });
 });
+
+router.get("/:id/requested",isLoggedIn, async (req, res) => {
+    
+    let { id } = req.params;
+    const listing = await Listing.findById(id)
+    .populate({
+        path: "RequestedBy.userId", // Populate the requestedBy field
+        model: "User" // Reference the User model
+    })
+    
+    .populate("reviews")
+    .populate("owner");
+    console.log(listing);
+    if (!listing) {
+        req.flash("error", "Listing you requested for does not exist!");
+        return res.redirect("/listings"); // Add return statement here
+    }
+    
+    res.render("listings/RequestedListing.ejs", { listing });
+});
+
 
 // Edit route
 router.get("/:id/edit",isOwner, async (req, res) => {
@@ -133,12 +150,21 @@ router.get("/search/:key", async (req, res) => {
         });
 
         console.log(data);
-        res.render("listings/index.ejs", { allListings: data });
+        if(data.length){
+            res.render("listings/index.ejs", { allListings: data });
+        }
+        else{
+            req.flash("error"," No Listing found for your search");
+           res.redirect("/listings")
+
+
+        }
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
     }
 });
+
 router.get("/sort/:sortBy", async (req, res) => {
     try {
         const { sortBy } = req.params;
@@ -162,6 +188,202 @@ router.get("/sort/:sortBy", async (req, res) => {
     }
 });
 
+router.get('/filter/Rental', async (req, res) => {
+    let data = await Listing.find({category : "Rental" });
+    console.log(data);
+    res.render("listings/index.ejs", { allListings: data });
+
+})
+router.get('/filter/Sell', async (req, res) => {
+    let data = await Listing.find({category : "Sell" });
+    console.log(data);
+    res.render("listings/index.ejs", { allListings: data });
+
+})
 
 
+router.post('/house', async (req, res) => {
+    let data = await Listing.find({type : "House" });
+    if(data.length){
+        res.render("listings/index.ejs", { allListings: data });
+    }
+    else{
+        req.flash("error"," No Listing found for your search");
+       res.redirect("/listings")
+    }
+});
+
+router.post('/villa', async(req, res) => {
+    let data = await Listing.find({type : "Villa" });
+    if(data.length){
+        res.render("listings/index.ejs", { allListings: data });
+    }
+    else{
+        req.flash("error"," No Listing found for your search");
+       res.redirect("/listings")
+    }
+  });
+
+router.post('/flat', async(req, res) => {
+    let data = await Listing.find({type : "Flat" });
+    if(data.length){
+        res.render("listings/index.ejs", { allListings: data });
+    }
+    else{
+        req.flash("error"," No Listing found for your search");
+       res.redirect("/listings")
+    }
+});
+
+router.post('/shop', async(req, res) => {
+    let data = await Listing.find({type : "Shop" });
+    if(data.length){
+        res.render("listings/index.ejs", { allListings: data });
+    }
+    else{
+        req.flash("error"," No Listing found for your search");
+       res.redirect("/listings")
+    }   
+});
+router.post('/:id/purchaseReq', async (req, res) => {
+    const { id } = req.params; // Listing ID
+    const {  phoneNumber } = req.body; 
+    const currUser = req.user; 
+
+    // console.log(currUser);
+    try {
+        const listing = await Listing.findById(id).populate('RequestedBy.userId')
+
+        if (!listing) {
+            return res.status(404).json({ error: 'Listing not found' });
+        }
+
+        if ( !listing.owner._id.equals(currUser._id)) {
+            if(listing.status > 0 ){
+                listing.status = listing.status + 1 ;
+            }
+            else{
+                listing.status = 1 ;
+
+            }
+        
+            listing.RequestedBy.push({
+                userId: currUser._id,
+                phoneNumber: phoneNumber,
+                status: 1
+            });
+
+            await listing.save();
+            console.log(listing);
+        res.redirect("/listings");
+    } }catch (error) {
+        console.error('Error purchasing listing:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// router.post('/:id/purchaseReq', async (req, res) => {
+//     const { id } = req.params;
+
+//     try {
+//         const listingId = id ;
+//         const currUser = req.user; 
+
+//         const listing = await Listing.findById(listingId);
+
+//         if (listing.category === 'Sell' && !listing.owner._id.equals(currUser._id)) {
+//             if(listing.status > 0 ){
+//                 listing.status = listing.status + 1 ;
+//             listing.RequestedBy = currUser;
+            
+//             }
+//             else{
+//                 listing.status = 1 ;
+//                 listing.RequestedBy = currUser;
+//             }
+
+//             await listing.save(); 
+
+//             res.status(200).json({ message: 'Purchase successful', listing: listing });
+//         } else {
+//             res.status(403).json({ error: 'Unable to purchase this listing' });
+//         }
+//     } catch (error) {
+//         console.error('Error processing purchase request:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
+
+router.post("/:id/:Currid/accepted",async(req,res)=>{
+    const { id, Currid } = req.params;
+
+    try {
+        const listingId = id;
+        const currUser = req.user;
+    
+        // Retrieve the listing by ID
+        const listing = await Listing.findById(listingId);
+    
+        if (!listing) {
+            return res.status(404).json({ error: 'Listing not found' });
+        }
+    
+        // Update AcceptStatus to indicate the request is accepted
+        listing.AcceptStatus = 1;
+    
+        // Find the corresponding RequestedBy entry for the current user
+        const requestedByEntry = listing.RequestedBy.find(entry => entry.userId.equals(currUser._id));
+    
+        if (requestedByEntry) {
+            // Update the status for the current user's request
+            requestedByEntry.status = 1;
+        } else {
+            // If the user's request entry doesn't exist, create a new one
+            listing.RequestedBy.push({ userId: currUser._id, status: 1 });
+        }
+    
+        // Save the updated listing
+        await listing.save();
+    
+        // Redirect or respond with success message
+        res.redirect("/approved-listings");
+    } catch (error) {
+        console.error('Error processing purchase request:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+
+})
+router.post("/:id/:Currid/rejected",async(req,res)=>{
+    const { id, Currid } = req.params;
+
+try {
+    const listingId = id;
+    const currUser = req.user;
+
+    // Find the listing by ID
+    const listing = await Listing.findById(listingId);
+
+    if (!listing) {
+        return res.status(404).json({ error: 'Listing not found' });
+    }
+
+    // Set listing status to 0 (or update as needed)
+    listing.status = 0;
+
+    // Filter out the requestedBy entry associated with the current user
+    listing.RequestedBy = listing.RequestedBy.filter(entry => !entry.userId.equals(currUser._id));
+
+    // Save the updated listing
+    await listing.save();
+
+    // Redirect or respond with success message
+    res.redirect("/approved-listings");
+} catch (error) {
+    console.error('Error processing purchase request:', error);
+    res.status(500).json({ error: 'Internal server error' });
+}
+
+
+})
 module.exports = router;

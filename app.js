@@ -33,6 +33,8 @@ const Listing = require("./models/listing.js");
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
 const dbUrl = process.env.ATLASDB_URL
+ 
+
 
 async function main() {
     try {
@@ -148,7 +150,11 @@ app.use("/",userRouter)
 //reviews
 //post-route
 
-
+app.get("/",async(req,res)=>{
+    const allListings = await Listing.find({})
+    // console.log(allListings)
+    res.render("listings/index.ejs", { allListings });
+})
 
 app.use((err, req, res, next) => {
     let { statusCode =500,message ="something went wrong" } = err;

@@ -5,24 +5,34 @@ const ExpressError = require("../utils/ExpressError.js");
 const Review = require("../models/review.js");
 const Listing = require("../models/listing.js");
 const {validateReview, isLoggedIn,isReviewAuthor}=require("../middleware.js")
-
+const upload = require('../multer.js')
 
 
 // Route to create a new review
 router.post(
     "/",
     isLoggedIn,
-    validateReview, 
+    // validateReview, 
+    upload.array("review[image]",5),
     wrapAsync(async (req, res) => {
+        const filenames = []; 
+
+        if (req.files) {
+            req.files.forEach(file => {
+                console.log('Uploaded File:', file.filename);
+                filenames.push(file.filename); 
+            });
+        }
+        
     let listing = await Listing.findById(req.params.id);
     let newReview = new Review(req.body.review);
+    newReview.image=filenames;
     newReview.author=req.user._id;
     listing.reviews.push(newReview);
 
     await newReview.save();
     await listing.save();
     req.flash("success","New Review Added");
-    // console.log("New review saved");
     res.redirect(`/listings/${listing._id}`);
 }));
 
