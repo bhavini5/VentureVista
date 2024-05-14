@@ -16,7 +16,7 @@ const User= require("../models/user.js");
 // Index route
 router.get("/", async (req, res) => {
     try {
-        console.log(req.user);
+        // console.log(req.user);
       const allListings = await Listing.find({AcceptStatus: 0});
       const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
