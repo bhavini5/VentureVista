@@ -6,6 +6,10 @@ const userSchema = new Schema({
     email: {
         type: String,
         required: true
+    },
+    status:{
+        type:Number,
+        default:0
     }
 });
 

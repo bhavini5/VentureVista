@@ -105,18 +105,26 @@ router.get("/requested/properties",async(req,res)=>{
         res.status(500).send("Internal Server Error");
     }
 })
-router.get("/approved-listings",async(req,res)=>{
-    const currUser = req.user;
-    const data = await Listing.find({ owner: currUser._id,AcceptStatus:1 });
-        if(data.length){
-            res.render("listings/Requestedindex.ejs", { allListings: data });
-        }
-        else{
-            req.flash("error","No approved Properties");
-           res.redirect("/listings")
+// router.get("/history", async (req, res) => {
+//     const data = await Listing.findAll({});
 
+//     const currUserId = req.user._id; // Get current user's ID from req.user
 
-        }
-})
+//     try {
+//         // Find listings where requestedBy.userId matches the current user's ID
+//         const data = await Listing.find({ "RequestedBy.userId": currUserId });
+//         // console.log(dat)
+//         if (data.length > 0) {
+//             res.render("listings/Requestedindex.ejs", { allListings: data });
+//         } else {
+//             req.flash("error", "No Listings Found In Your Account");
+//             return res.redirect("/listings");
+//         }
+//     } catch (error) {
+//         console.error('Error fetching user history:', error);
+//         res.status(500).json({ error: 'Internal server error' });
+//     }
+// });
+
 
 module.exports=router;

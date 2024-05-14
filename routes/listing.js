@@ -342,9 +342,13 @@ router.post("/:id/:Currid/accepted",async(req,res)=>{
             // If the user's request entry doesn't exist, create a new one
             listing.RequestedBy.push({ userId: currUser._id, status: 1 });
         }
+        currUser.status = currUser.status + 1;
+        await currUser.save();
     
+
         // Save the updated listing
         await listing.save();
+        await 
     
         // Redirect or respond with success message
         res.redirect("/approved-listings");
