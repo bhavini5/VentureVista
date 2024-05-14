@@ -91,7 +91,12 @@
   #myBtn{
     width: 6rem;
     height: 2rem;
-    margin-left: 20rem;
+    margin-left: 28rem;
+    background-color: #47e288;
+    color: #000;
+    border: 1px solid black;
+    border-radius: 5px;
+    
   }
 
 
@@ -158,6 +163,12 @@
                                 Sold Out
                               </div>
                         <%    } %>
+                        <% const requestedByCurrentUser = listing.RequestedBy.some(entry => entry.userId.equals(currUser._id)); %>
+                        <% if(listing.AcceptStatus === 0 && listing.status === 1 && requestedByCurrentUser) { %>
+                          <div class="alert alert-danger" role="alert">
+                            Requested By You
+                          </div>
+                    <%    } %>
                           </div>
                           <% isFirst = false; %>
                         <% } %>
@@ -176,7 +187,7 @@
                 <!-- Output listing status for debugging -->
               
                 <div class="requestBox">
-                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.AcceptStatus === 0) { %>
+                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.AcceptStatus === 0 && listing.status === 1) { %>
                         <!-- Display requests if the listing is for sale and has requests -->
                         <p class="requests">All Requests</p> 
                         <% listing.RequestedBy.forEach(request => { %>
@@ -203,15 +214,14 @@
                                     <!-- Add other purchase details as needed -->
                                 </div>
                         <% } %>
-            </div>
-              </div>
-              
-              </div>
-              </div>
+                         </div>
+                      </div>
+                      </div>
+                      </div>
 
               <div class="card-body" style="margin-left: 20rem;">
                 <p class="card-text">
-                  <ul>
+                  <ul style="margin-left: 0rem;">
                       <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br>
                       <b>Contact:</b> <i> <%= listing.contact %> </i><br><br>
                       &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
@@ -226,8 +236,8 @@
               </div>
               <br>
               
-                <% if (currUser && !listing.owner._id.equals(currUser._id) && listing.status == 0) { %>
-                  <form action="/listings/<%=listing._id%>/purchaseReq" method="POST">
+                <% if (currUser && !listing.owner._id.equals(currUser._id) && listing.AcceptStatus == 0) { %>
+                  <form  action="/listings/<%=listing._id%>/purchaseReq" method="POST">
                     <button id="myBtn">Purchase</button>
                     <!-- The Modal -->
                     <div id="myModal" class="modal">
@@ -247,28 +257,26 @@
                       </div>
                     </div>
                     </form>
-                
+                <br>
               <% } %>
-              <br>
-              <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
-              <div class="btns">
+              <% if(currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
+              <div style="margin-left:5rem;" class="btns">
                   <a class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
                   <form method="post"  action="/listings/<%=listing._id%>/delete?_method=DELETE">
                   <button class="btn btn-dark offset-4">Delete</button>
                   </form>
                 </div>
                 <% }%>
-                <br>
-                <% if(currUser) { %>
+                <% if(currUser && !listing.owner._id.equals(currUser._id)) { %>
                 
-                <div class="col-8 offset-3">
+                <div style="margin-left: 28rem;" class="col-8 offset-3">
                   <!-- <hr> -->
                   <h4>Leave a Review</h4>
                   <form action="/listings/<%=listing._id%>/reviews" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
                       <!-- <lable class="form-label" for="rating">Rating</lable>
                       <input type="range" min="1" max="5" id="rating" name="review[rating]" class="form-range"> -->
                     <div class="mb-3 mt-3">
-                      <label for="rating" class="form-label">Rating</label>
+                      <label for="rating" class="form-label"><b>Rating</b></label>
   
                     <fieldset class="starability-slot">
                       <input 
@@ -292,7 +300,7 @@
                     </fieldset>
                   </div>
                     <div class="mb-3 mt-3">
-                      <lable class="form-label" for="comment">Comments</lable>
+                      <lable class="form-label" for="comment"><b>Comments</b></lable>
                       <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
                       <p> Attach some images</p><input name="review[image]" type="file" multiple>
                       <div class="invalid-feedback">
@@ -339,8 +347,8 @@
             </div>
           <!-- </div> -->
           
-              
-              <div style="margin-left: 27rem;" class="col-8 offset-3 mb-3">
+              <br>
+              <div style="margin-left: 29rem;" class="col-8 offset-3 mb-3">
                 <h3>Where you'll be</h3>
                 <div id="map"></div>
               </div>

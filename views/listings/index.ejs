@@ -64,6 +64,10 @@
     <!-- <form method="get" action="/listings/new">
       <button>Create a new Listing</button>
     </form> -->
+    <div class="alert alert-primary" role="alert">
+      <div style="font-size: 1.2rem; margin-left: 30rem;"><b>Properties rented By Our Site: <%=count%> </b></div>
+
+    </div>
     <div id="filters">
       <div class="filter">
         <form action="/listings/house" method="POST">
@@ -148,13 +152,13 @@
        <div class="row row-cols-lg-4 row-cols-md-4 row-cols-sm-1 ml-4" style="margin-left: 1rem; margin-bottom:6rem ;margin-top: 4rem;">
 
       <%for(let listing of allListings){ %>
-        <a href="/listings/<%=listing._id%>" class="listing-link">
+        <a href="/listings/<%=listing._id%>" class="listing-link" >
         <div class="card col listing-card" >
           <div class="row" >
             <div class="col">
               <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel" style="cursor: none;">
 
-                <div class="carousel-inner">
+                <div class="carousel-inner" >
                   <% let isFirst = true; %>
                   <% for (let image of listing.image) { %>
                     <div class="carousel-item <%= isFirst ? 'active' : '' %>">
@@ -164,6 +168,7 @@
                           Sold Out
                         </div>
                   <%    } %>
+                 
                     </div>
                     <% isFirst = false; %>
                   <% } %>

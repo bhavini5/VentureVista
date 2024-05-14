@@ -5,7 +5,7 @@ const { userSchema } = require("../schema.js");
 const ExpressError = require("../utils/ExpressError.js");
 const User= require("../models/user.js");
 const passport = require("passport");
-const {saveRedirectUrl}=require("../middleware.js")
+const {saveRedirectUrl,isLoggedIn}=require("../middleware.js")
 const Listing = require("../models/listing.js");
 
 router.get("/signup",(req,res)=>{
@@ -58,8 +58,9 @@ router.post("/login",saveRedirectUrl,
     })
 
 
-    router.get("/my_properties", async (req, res) => {
+    router.get("/my_properties",isLoggedIn, async (req, res) => {
         try {
+            const count = await Listing.countDocuments({ AcceptStatus: 1 });
             const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
             // console.log(currUser);
             if (!currUser) {
@@ -68,7 +69,7 @@ router.post("/login",saveRedirectUrl,
     
             const data = await Listing.find({ owner: currUser._id });
             if(data.length){
-                res.render("listings/index.ejs", { allListings: data });
+                res.render("listings/index.ejs", { allListings: data,count });
             }
             else{
                 req.flash("error","You have no Property listed");
@@ -82,8 +83,9 @@ router.post("/login",saveRedirectUrl,
         }
     });
 
-router.get("/requested/properties",async(req,res)=>{
+router.get("/requested/properties",isLoggedIn,async(req,res)=>{
     try {
+        const count = await Listing.countDocuments({ AcceptStatus: 1 });
         const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
         // console.log(currUser);
         if (!currUser) {
@@ -92,7 +94,7 @@ router.get("/requested/properties",async(req,res)=>{
 
         const data = await Listing.find({ owner: currUser._id,AcceptStatus:0 });
         if(data.length){
-            res.render("listings/Requestedindex.ejs", { allListings: data });
+            res.render("listings/Requestedindex.ejs", { allListings: data ,count});
         }
         else{
             req.flash("error","You have no Requested listing");

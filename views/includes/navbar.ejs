@@ -21,7 +21,7 @@
 </style>
 
 <nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-    <div class="container-fluid">
+    <div  class="container-fluid">
       <a class="navbar-brand" href="/listings"><i class="fa-regular fa-compass"></i></a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" 
       data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,8 +32,10 @@
           <!-- <a class="nav-link active" aria-current="page" href="/">Home</a> -->
           <a class="nav-link" href="/listings">Explore</a>
         </div>
+       
         <div class="navbar-nav ms-auto">
-          <form id="searchForm" class="d-flex" method="GET" action="/listings/search/:key">
+          
+          <form style="    margin-left: 14rem;width: 20rem;" id="searchForm" class="d-flex" method="GET" action="/listings/search/:key">
               <input id="searchInput" class="form-control me-2 search-inp" name="key" type="search" placeholder="Search">
               <button class="btn search-btn" type="submit">
                   <i class="fa-solid fa-magnifying-glass"></i>Search

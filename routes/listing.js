@@ -15,10 +15,17 @@ const User= require("../models/user.js");
 
 // Index route
 router.get("/", async (req, res) => {
-    const allListings = await Listing.find({})
-    // console.log(allListings)
-    res.render("listings/index.ejs", { allListings });
-});
+    try {
+        
+      const allListings = await Listing.find({});
+      const count = await Listing.countDocuments({ AcceptStatus: 1 });
+      res.render("listings/index.ejs", { allListings, count });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    }
+  });
+  
 
 // New route
 router.get("/new", isLoggedIn, (req, res) => {
@@ -139,6 +146,7 @@ router.delete("/:id/delete",isLoggedIn,isOwner, async (req, res) => {
 
 router.get("/search/:key", async (req, res) => {
     try {
+        const count = await Listing.countDocuments({ AcceptStatus: 1 });
         const { key } = req.params;
 
         // Use regular expressions with the 'i' flag for case sensitivity
@@ -151,7 +159,7 @@ router.get("/search/:key", async (req, res) => {
 
         console.log(data);
         if(data.length){
-            res.render("listings/index.ejs", { allListings: data });
+            res.render("listings/index.ejs", { allListings: data,count });
         }
         else{
             req.flash("error"," No Listing found for your search");
@@ -167,6 +175,7 @@ router.get("/search/:key", async (req, res) => {
 
 router.get("/sort/:sortBy", async (req, res) => {
     try {
+        const count = await Listing.countDocuments({ AcceptStatus: 1 });
         const { sortBy } = req.params;
         // console.log(sortBy); 
         let sortCriteria;
@@ -181,7 +190,7 @@ router.get("/sort/:sortBy", async (req, res) => {
 
         const data = await Listing.find().sort(sortCriteria);
         console.log(data);
-        res.render("listings/index.ejs", { allListings: data });
+        res.render("listings/index.ejs", { allListings: data,count });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -189,23 +198,33 @@ router.get("/sort/:sortBy", async (req, res) => {
 });
 
 router.get('/filter/Rental', async (req, res) => {
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     let data = await Listing.find({category : "Rental" });
-    console.log(data);
-    res.render("listings/index.ejs", { allListings: data });
+    if(data.length){
+        res.render("listings/index.ejs", { allListings: data,count });
+    }
+    else{
+        req.flash("error"," No Listing found for your search");
+       res.redirect("/listings")
+
+
+    }
 
 })
 router.get('/filter/Sell', async (req, res) => {
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     let data = await Listing.find({category : "Sell" });
     console.log(data);
-    res.render("listings/index.ejs", { allListings: data });
+    res.render("listings/index.ejs", { allListings: data,count });
 
 })
 
 
 router.post('/house', async (req, res) => {
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     let data = await Listing.find({type : "House" });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data });
+        res.render("listings/index.ejs", { allListings: data ,count });
     }
     else{
         req.flash("error"," No Listing found for your search");
@@ -214,9 +233,10 @@ router.post('/house', async (req, res) => {
 });
 
 router.post('/villa', async(req, res) => {
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     let data = await Listing.find({type : "Villa" });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data });
+        res.render("listings/index.ejs", { allListings: data,count });
     }
     else{
         req.flash("error"," No Listing found for your search");
@@ -225,9 +245,10 @@ router.post('/villa', async(req, res) => {
   });
 
 router.post('/flat', async(req, res) => {
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     let data = await Listing.find({type : "Flat" });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data });
+        res.render("listings/index.ejs", { allListings: data,count });
     }
     else{
         req.flash("error"," No Listing found for your search");
@@ -237,15 +258,16 @@ router.post('/flat', async(req, res) => {
 
 router.post('/shop', async(req, res) => {
     let data = await Listing.find({type : "Shop" });
+    const count = await Listing.countDocuments({ AcceptStatus: 1 });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data });
+        res.render("listings/index.ejs", { allListings: data,count });
     }
     else{
         req.flash("error"," No Listing found for your search");
        res.redirect("/listings")
     }   
 });
-router.post('/:id/purchaseReq', async (req, res) => {
+router.post('/:id/purchaseReq', isLoggedIn,async (req, res) => {
     const { id } = req.params; // Listing ID
     const {  phoneNumber } = req.body; 
     const currUser = req.user; 
@@ -259,14 +281,9 @@ router.post('/:id/purchaseReq', async (req, res) => {
         }
 
         if ( !listing.owner._id.equals(currUser._id)) {
-            if(listing.status > 0 ){
-                listing.status = listing.status + 1 ;
-            }
-            else{
+
                 listing.status = 1 ;
 
-            }
-        
             listing.RequestedBy.push({
                 userId: currUser._id,
                 phoneNumber: phoneNumber,
@@ -315,7 +332,7 @@ router.post('/:id/purchaseReq', async (req, res) => {
 // });
 
 
-router.post("/:id/:Currid/accepted",async(req,res)=>{
+router.post("/:id/:Currid/accepted",isLoggedIn,async(req,res)=>{
     const { id, Currid } = req.params;
 
     try {
@@ -351,43 +368,42 @@ router.post("/:id/:Currid/accepted",async(req,res)=>{
         await 
     
         // Redirect or respond with success message
-        res.redirect("/approved-listings");
+        res.redirect("/my_properties");
     } catch (error) {
         console.error('Error processing purchase request:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 
 })
-router.post("/:id/:Currid/rejected",async(req,res)=>{
+router.post("/:id/:Currid/rejected", isLoggedIn, async (req, res) => {
     const { id, Currid } = req.params;
 
-try {
-    const listingId = id;
-    const currUser = req.user;
+    try {
+        const listingId = id;
+        const currUser = req.user;
 
-    // Find the listing by ID
-    const listing = await Listing.findById(listingId);
+        // Find the listing by ID
+        const listing = await Listing.findById(listingId);
 
-    if (!listing) {
-        return res.status(404).json({ error: 'Listing not found' });
+        if (!listing) {
+            return res.status(404).json({ error: 'Listing not found' });
+        }
+
+        // Set listing status to 0 (or update as needed)
+        listing.status = 0;
+
+        // Filter out the requestedBy entry associated with the current user
+        listing.RequestedBy = listing.RequestedBy.filter(entry => !entry.userId.equals(currUser._id));
+
+        // Save the updated listing
+        await listing.save();
+
+        // Redirect or respond with success message
+        res.redirect("/my_properties");
+    } catch (error) {
+        console.error('Error processing purchase request:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
+});
 
-    // Set listing status to 0 (or update as needed)
-    listing.status = 0;
-
-    // Filter out the requestedBy entry associated with the current user
-    listing.RequestedBy = listing.RequestedBy.filter(entry => !entry.userId.equals(currUser._id));
-
-    // Save the updated listing
-    await listing.save();
-
-    // Redirect or respond with success message
-    res.redirect("/approved-listings");
-} catch (error) {
-    console.error('Error processing purchase request:', error);
-    res.status(500).json({ error: 'Internal server error' });
-}
-
-
-})
 module.exports = router;
