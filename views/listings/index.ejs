@@ -65,8 +65,8 @@
       <button>Create a new Listing</button>
     </form> -->
     <div class="alert alert-primary" role="alert">
-      <div style="font-size: 1.2rem; margin-left: 30rem;"><b>Properties rented By Our Site: <%=count%> </b></div>
-
+      <div style="font-size: 1.2rem; margin-left: 30rem;"><b>Properties Sold through Our Platform: <%=count1%> </b></div>
+      <div style="font-size: 1.2rem; margin-left: 30rem;"><b>Properties Leased through Our Platform: <%=count2%> </b></div>
     </div>
     <div id="filters">
       <div class="filter">
@@ -75,8 +75,7 @@
           <button class="ibuttons" type="submit"><p>House</p></button>
         </form>
       </div>
-      
-      
+
       
       <div class="filter">
         <form action="/listings/flat" method="POST">
@@ -119,7 +118,7 @@
       </div> -->
    
 </div>
-     <div class="category">
+    <div class="category">
       <form action="/listings/filter/Sell" method="GET">
         <button class="categoryButton" type="submit">Properties on Sale</button>
     </form>

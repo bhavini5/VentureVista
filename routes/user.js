@@ -60,7 +60,8 @@ router.post("/login",saveRedirectUrl,
 
     router.get("/my_properties",isLoggedIn, async (req, res) => {
         try {
-            const count = await Listing.countDocuments({ AcceptStatus: 1 });
+            const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
+      const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
             const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
             // console.log(currUser);
             if (!currUser) {
@@ -69,7 +70,7 @@ router.post("/login",saveRedirectUrl,
     
             const data = await Listing.find({ owner: currUser._id });
             if(data.length){
-                res.render("listings/index.ejs", { allListings: data,count });
+                res.render("listings/index.ejs", { allListings: data,count1,count2 });
             }
             else{
                 req.flash("error","You have no Property listed");
@@ -85,16 +86,17 @@ router.post("/login",saveRedirectUrl,
 
 router.get("/requested/properties",isLoggedIn,async(req,res)=>{
     try {
-        const count = await Listing.countDocuments({ AcceptStatus: 1 });
+        const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
+      const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
         const currUser = req.user; // Assuming user object is available in request (e.g., from authentication middleware)
         // console.log(currUser);
         if (!currUser) {
             return res.status(403).send('User not authenticated');
         }
 
-        const data = await Listing.find({ owner: currUser._id,AcceptStatus:0 });
+        const data = await Listing.find({ owner: currUser._id, status:1,AcceptStatus:0 });
         if(data.length){
-            res.render("listings/Requestedindex.ejs", { allListings: data ,count});
+            res.render("listings/Requestedindex.ejs", { allListings: data ,count1,count2});
         }
         else{
             req.flash("error","You have no Requested listing");
