@@ -166,8 +166,12 @@ const listing =  <%-JSON.stringify(listing) %>;
                 <ul>
                     <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br>
                     <b>Contact:</b> <i> <%= listing.contact %> </i><br><br>
-                    &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
-                    <%=listing.description%><br>
+                    <% if( listing.category === "Rental" ) {%>
+                      <b>Price:</b> &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
+                       <%} else {%>
+                         <b>Price:</b> &#x20B9; <%=listing.price.toLocaleString("en-IN")%><br>
+                         <%}%>
+                  <b>Description:</b>  <%=listing.description%><br>
                    <b>Location:</b> <%=listing.address%>/
                     <%=listing.location%><br> 
 
@@ -183,8 +187,8 @@ const listing =  <%-JSON.stringify(listing) %>;
               </form>
             <% } %>
             <% if(currUser && listing.owner._id.equals(currUser._id)) { %>
-            <div class="btns">
-                <a class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
+            <div class="btns" style="margin-left: 9rem;" >
+              <a style="width: 4rem" class="btn btn-danger col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
                 <form method="post"  action="/listings/<%=listing._id%>/delete?_method=DELETE">
                 <button class="btn btn-dark offset-4">Delete</button>
                 </form>

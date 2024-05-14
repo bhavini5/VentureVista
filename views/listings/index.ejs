@@ -189,7 +189,11 @@
           <div class="card-body">
             <p class="card-text">
               <b> <%=listing.title%><br> </b>
-              &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/night
+              <% if( listing.category === "Rental" ) {%>
+                &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month
+                <%} else {%>
+                  &#x20B9; <%=listing.price.toLocaleString("en-IN")%>
+                  <%}%>
               <i class="taxInfo">  +18% GST </i>
             </p>
           </div>

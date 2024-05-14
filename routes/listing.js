@@ -166,7 +166,7 @@ router.get("/search/:key", async (req, res) => {
             res.render("listings/index.ejs", { allListings: data,count1,count2 });
         }
         else{
-            req.flash("error"," No Listing found for your search");
+            req.flash("error"," No Property found for your search");
            res.redirect("/listings")
 
 
@@ -210,7 +210,7 @@ router.get('/filter/Rental', async (req, res) => {
         res.render("listings/index.ejs", { allListings: data,count1,count2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }
 
@@ -224,7 +224,7 @@ router.get('/filter/Sell', async (req, res) => {
         res.render("listings/index.ejs", { allListings: data,count1,count2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }
 
@@ -239,7 +239,7 @@ router.post('/house', async (req, res) => {
         res.render("listings/index.ejs", { allListings: data ,count1,count2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }
 });
@@ -252,7 +252,7 @@ router.post('/villa', async(req, res) => {
         res.render("listings/index.ejs", { allListings: data,count1,count2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }
   });
@@ -265,7 +265,7 @@ router.post('/flat', async(req, res) => {
         res.render("listings/index.ejs", { allListings: data,count1,coun2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }
 });
@@ -278,7 +278,7 @@ router.post('/shop', async(req, res) => {
         res.render("listings/index.ejs", { allListings: data,count1,count2 });
     }
     else{
-        req.flash("error"," No Listing found for your search");
+        req.flash("error"," No Property found for your search");
        res.redirect("/listings")
     }   
 });

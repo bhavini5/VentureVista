@@ -206,7 +206,7 @@
                         <% } %>
                         <% if (( currUser && listing.owner._id.equals(currUser._id ) )&& listing.AcceptStatus == 1) { %>
                             <!-- Display purchaser information -->
-                            <p class="RequestedBy">Purchased By</p>
+                            <p class="RequestedBy"><u><b>Purchased By</b></u></p>
                                 <div class="RequestedBy">
                                     <p><b>Phone Number:</b> <%= listing.RequestedBy[0].phoneNumber %></p>
                                     <p><b>Username:</b> <%= listing.RequestedBy[0].userId.username %></p>
@@ -223,9 +223,13 @@
                 <p class="card-text">
                   <ul style="margin-left: 0rem;">
                       <b>Owned By :</b> <i> <%= listing.owner.username %> </i><br>
-                      <b>Contact:</b> <i> <%= listing.contact %> </i><br><br>
-                      &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
-                      <%=listing.description%><br>
+                      <b>Contact:</b> <i> <%= listing.contact %> </i><br>
+                      <% if( listing.category === "Rental" ) {%>
+                       <b>Price:</b> &#x20B9; <%=listing.price.toLocaleString("en-IN")%>/month<br>
+                        <%} else {%>
+                          <b>Price:</b> &#x20B9; <%=listing.price.toLocaleString("en-IN")%><br>
+                          <%}%>
+                      <b>Description:</b> <%=listing.description%><br>
                      <b>Location:</b> <%=listing.address%>/
                       <%=listing.location%><br> 
   
@@ -260,8 +264,8 @@
                 <br>
               <% } %>
               <% if(currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
-              <div style="margin-left:5rem;" class="btns">
-                  <a class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
+              <div style="margin-left:9rem;" class="btns">
+                  <a style="width: 5rem" class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
                   <form method="post"  action="/listings/<%=listing._id%>/delete?_method=DELETE">
                   <button class="btn btn-dark offset-4">Delete</button>
                   </form>

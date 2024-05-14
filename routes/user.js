@@ -99,7 +99,7 @@ router.get("/requested/properties",isLoggedIn,async(req,res)=>{
             res.render("listings/Requestedindex.ejs", { allListings: data ,count1,count2});
         }
         else{
-            req.flash("error","You have no Requested listing");
+            req.flash("error","You have no Requested Property");
            res.redirect("/listings")
 
 
