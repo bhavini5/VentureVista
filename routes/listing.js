@@ -16,11 +16,16 @@ const User= require("../models/user.js");
 // Index route
 router.get("/", async (req, res) => {
     try {
-        
+        console.log(req.user);
       const allListings = await Listing.find({AcceptStatus: 0});
       const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
-      res.render("listings/index.ejs", { allListings, count1,count2 });
+      res.render("listings/index.ejs", {
+        allListings,
+        count1,
+        count2,
+        user: req.user || { username: 'Guest' } // Provide a default user object if req.user is undefined
+    });
     } catch (error) {
       console.error(error);
       res.status(500).send("Internal Server Error");
@@ -163,7 +168,7 @@ router.get("/search/:key", async (req, res) => {
 
         console.log(data);
         if(data.length){
-            res.render("listings/index.ejs", { allListings: data,count1,count2 });
+            res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
         }
         else{
             req.flash("error"," No Property found for your search");
@@ -195,7 +200,7 @@ router.get("/sort/:sortBy", async (req, res) => {
 
         const data = await Listing.find({AcceptStatus: 0}).sort(sortCriteria);
         console.log(data);
-        res.render("listings/index.ejs", { allListings: data,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2 ,user: req.user || { username: 'Guest' }});
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal Server Error');
@@ -207,7 +212,7 @@ router.get('/filter/Rental', async (req, res) => {
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     let data = await Listing.find({category : "Rental",AcceptStatus: 0 });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");
@@ -221,7 +226,7 @@ router.get('/filter/Sell', async (req, res) => {
     let data = await Listing.find({category : "Sell",AcceptStatus: 0 });
     console.log(data);
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");
@@ -236,7 +241,7 @@ router.post('/house', async (req, res) => {
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     let data = await Listing.find({type : "House",AcceptStatus: 0 });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data ,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data ,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");
@@ -249,7 +254,7 @@ router.post('/villa', async(req, res) => {
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     let data = await Listing.find({type : "Villa" ,AcceptStatus: 0});
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");
@@ -262,7 +267,7 @@ router.post('/flat', async(req, res) => {
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     let data = await Listing.find({type : "Flat",AcceptStatus: 0 });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data,count1,coun2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");
@@ -275,7 +280,7 @@ router.post('/shop', async(req, res) => {
     const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
       const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     if(data.length){
-        res.render("listings/index.ejs", { allListings: data,count1,count2 });
+        res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
     else{
         req.flash("error"," No Property found for your search");

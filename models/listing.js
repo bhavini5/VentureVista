@@ -77,6 +77,10 @@ const listingSchema = new Schema({
         type: String,
         enum: ["Sell", "Rental"]
     },
+    Date:{
+      type: Date,
+      default: Date.now
+    },
       contact: {
         type: String,
         unique: [true, "Phone number is already in use."]

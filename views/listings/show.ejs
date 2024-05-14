@@ -91,7 +91,7 @@
   #myBtn{
     width: 6rem;
     height: 2rem;
-    margin-left: 28rem;
+    margin-left: 33rem;
     background-color: #47e288;
     color: #000;
     border: 1px solid black;
@@ -232,7 +232,7 @@
                       <b>Description:</b> <%=listing.description%><br>
                      <b>Location:</b> <%=listing.address%>/
                       <%=listing.location%><br> 
-  
+                      <b>Date:</b> <span id="dateDisplay"></span>
                   </ul>
                 </p>
               </div>
@@ -273,7 +273,7 @@
                 <% }%>
                 <% if(currUser && !listing.owner._id.equals(currUser._id)) { %>
                 
-                <div style="margin-left: 28rem;" class="col-8 offset-3">
+                <div style="margin-left: 33rem;" class="col-8 offset-3">
                   <!-- <hr> -->
                   <h4>Leave a Review</h4>
                   <form action="/listings/<%=listing._id%>/reviews" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
@@ -305,7 +305,7 @@
                   </div>
                     <div class="mb-3 mt-3">
                       <lable class="form-label" for="comment"><b>Comments</b></lable>
-                      <textarea name="review[comment]" id="comment" cols="30" rows="5" class="form-control" required></textarea>
+                      <textarea style="height: 7rem;width: 29rem;" name="review[comment]" id="comment" cols="10" rows="5" class="form-control" required></textarea>
                       <p> Attach some images</p><input name="review[image]" type="file" multiple>
                       <div class="invalid-feedback">
                         Please submit some comments for reviews
@@ -352,7 +352,7 @@
           <!-- </div> -->
           
               <br>
-              <div style="margin-left: 29rem;" class="col-8 offset-3 mb-3">
+              <div style="margin-left: 33rem;" class="col-8 offset-3 mb-3">
                 <h3>Location Insight</h3>
                 <div id="map"></div>
               </div>
@@ -377,6 +377,24 @@
                   modal.style.display = "none";
                 }
               }
+              document.addEventListener('DOMContentLoaded', function () {
+            // Replace the listing.Date string with the actual date value from your EJS template
+            const dateString = '<%= listing.Date %>';
+            const date = new Date(dateString);
+            
+            // Options for date formatting excluding time
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric'
+            };
+            
+            // Format the date
+            const formattedDate = date.toLocaleDateString('en-US', options);
+            document.getElementById('dateDisplay').innerText = formattedDate;
+        });
+
             </script>
                 
       

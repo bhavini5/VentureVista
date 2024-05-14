@@ -70,7 +70,12 @@ router.post("/login",saveRedirectUrl,
     
             const data = await Listing.find({ owner: currUser._id });
             if(data.length){
-                res.render("listings/index.ejs", { allListings: data,count1,count2 });
+                res.render("listings/index.ejs", {
+                     allListings: data
+                     ,count1,
+                     count2,
+                     user: req.user || { username: 'Guest' }
+                     });
             }
             else{
                 req.flash("error","You have no Property listed");
