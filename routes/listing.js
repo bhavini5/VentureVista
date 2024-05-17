@@ -81,9 +81,14 @@ router.get("/:id",isLoggedIn, async (req, res) => {
         path: "RequestedBy.userId", // Populate the requestedBy field
         model: "User" // Reference the User model
     })
-    
-    .populate("reviews")
-    .populate("owner");
+    .populate({
+        path: "reviews",
+        populate: {
+            path: "author", // Populate the author field within each review
+            model: "User" // Reference the User model
+        }
+    })
+    .populate("owner")
     console.log(listing);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
@@ -287,33 +292,48 @@ router.post('/shop', async(req, res) => {
        res.redirect("/listings")
     }   
 });
-router.post('/:id/purchaseReq', isLoggedIn,async (req, res) => {
-    const { id } = req.params; // Listing ID
-    const {  phoneNumber } = req.body; 
-    const currUser = req.user; 
+const mongoose = require('mongoose');
 
-    // console.log(currUser);
+router.post('/:id/purchaseReq', isLoggedIn, async (req, res) => {
+    const { id } = req.params; // Listing ID
+    const { phoneNumber } = req.body;
+    const currUser = req.user;
+
+    // Validate the ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+        return res.status(400).json({ error: 'Invalid listing ID' });
+    }
+
     try {
-        const listing = await Listing.findById({id}).populate('RequestedBy.userId')
+        // Find the listing by ID
+        const listing = await Listing.findById(id).populate('RequestedBy.userId');
 
         if (!listing) {
             return res.status(404).json({ error: 'Listing not found' });
         }
 
-        if ( !listing.owner._id.equals(currUser._id)) {
+        // Check if the current user is not the owner
+        if (!listing.owner._id.equals(currUser._id)) {
+            // Check if the user has already requested this listing
+            const alreadyRequested = listing.RequestedBy.some(request => request.userId.equals(currUser._id));
+            if (alreadyRequested) {
+                return res.status(400).json({ error: 'You have already requested this listing' });
+            }
 
-                listing.status = 1 ;
-
+            // Update listing status and add request details
+            // listing.status = 1;
             listing.RequestedBy.push({
                 userId: currUser._id,
                 phoneNumber: phoneNumber,
                 status: 1
             });
 
-            await listing.save();
-            console.log(listing);
-        res.redirect("/listings");
-    } }catch (error) {
+            await listing.save(); // Save the listing
+            res.redirect("/listings");
+        } else {
+            res.status(403).json({ error: 'You cannot request your own listing' });
+        }
+    } catch (error) {
         console.error('Error purchasing listing:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -352,67 +372,27 @@ router.post('/:id/purchaseReq', isLoggedIn,async (req, res) => {
 // });
 
 
-router.post("/:id/:Currid/accepted",isLoggedIn,async(req,res)=>{
+router.post("/:id/:Currid/accepted", isLoggedIn, async (req, res) => {
     const { id, Currid } = req.params;
 
     try {
         const listingId = id;
         const currUser = req.user;
-    
+
         // Retrieve the listing by ID
         const listing = await Listing.findById(listingId);
-    
+
         if (!listing) {
             return res.status(404).json({ error: 'Listing not found' });
         }
-    
+
         // Update AcceptStatus to indicate the request is accepted
         listing.AcceptStatus = 1;
-    
-        // Find the corresponding RequestedBy entry for the current user
-        const requestedByEntry = listing.RequestedBy.find(entry => entry.userId.equals(currUser._id));
-    
-        if (requestedByEntry) {
-            // Update the status for the current user's request
-            requestedByEntry.status = 1;
-        } else {
-            // If the user's request entry doesn't exist, create a new one
-            listing.RequestedBy.push({ userId: currUser._id, status: 1 });
-        }
-        currUser.status = currUser.status + 1;
-        await currUser.save();
-    
 
-        // Save the updated listing
-        await listing.save();
-    
-        // Redirect or respond with success message
-        res.redirect("/my_properties");
-    } catch (error) {
-        console.error('Error processing purchase request:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-
-})
-router.post("/:id/:Currid/rejected", isLoggedIn, async (req, res) => {
-    const { id, Currid } = req.params;
-
-    try {
-        const listingId = id;
-        const currUser = req.user;
-
-        // Find the listing by ID
-        const listing = await Listing.findById(listingId);
-
-        if (!listing) {
-            return res.status(404).json({ error: 'Listing not found' });
-        }
-
-        // Set listing status to 0 (or update as needed)
-        listing.status = 0;
-
-        // Filter out the requestedBy entry associated with the current user
-        listing.RequestedBy = listing.RequestedBy.filter(entry => !entry.userId.equals(currUser._id));
+        
+        // Update currUser status
+        // currUser.status = currUser.status + 1;
+        // await currUser.save();
 
         // Save the updated listing
         await listing.save();
@@ -424,5 +404,42 @@ router.post("/:id/:Currid/rejected", isLoggedIn, async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+router.post("/:id/:Currid/rejected", isLoggedIn, async (req, res) => {
+    const { id, Currid } = req.params;
+
+    try {
+        // Find the listing by ID
+        const listing = await Listing.findById(id);
+
+        // If the listing is not found, return a 404 error
+        if (!listing) {
+            return res.status(404).json({ error: 'Listing not found' });
+        }
+
+        // Update the listing status to 0
+        listing.status = 0;
+
+        // Find the specific RequestedBy entry and update its status to 0
+        const requestedByEntry = listing.RequestedBy.find(entry => entry.userId.toString() === Currid);
+        if (requestedByEntry) {
+            requestedByEntry.status = 0;
+        } else {
+            return res.status(404).json({ error: 'RequestedBy entry not found for specified user' });
+        }
+
+        // Save the updated listing
+        await listing.save();
+
+        // Redirect to "/my_properties" on success
+        res.redirect("/my_properties");
+    } catch (error) {
+        // Log and return a 500 internal server error on failure
+        console.error('Error processing request:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 
 module.exports = router;

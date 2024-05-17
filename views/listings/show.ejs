@@ -91,7 +91,7 @@
   #myBtn{
     width: 6rem;
     height: 2rem;
-    margin-left: 33rem;
+    margin-left: 30rem;
     background-color: #47e288;
     color: #000;
     border: 1px solid black;
@@ -113,6 +113,7 @@
     font-size: 18px;
     font-weight: bold;
     margin-bottom: 10px;
+    margin-left: 2rem;
 }
 
 /* Styles for each request item */
@@ -164,7 +165,7 @@
                               </div>
                         <%    } %>
                         <% const requestedByCurrentUser = listing.RequestedBy.some(entry => entry.userId.equals(currUser._id)); %>
-                        <% if(listing.AcceptStatus === 0 && listing.status === 1 && requestedByCurrentUser) { %>
+                        <% if(listing.AcceptStatus === 0 && requestedByCurrentUser) { %>
                           <div class="alert alert-danger" role="alert">
                             Requested By You
                           </div>
@@ -187,13 +188,16 @@
                 <!-- Output listing status for debugging -->
               
                 <div class="requestBox">
-                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.AcceptStatus === 0 && listing.status === 1) { %>
+                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.AcceptStatus === 0 ) { %>
                         <!-- Display requests if the listing is for sale and has requests -->
                         <p class="requests">All Requests</p> 
                         <% listing.RequestedBy.forEach(request => { %>
                             <div class="requestItem"> 
                                 <p class="email"><b>Email:</b><%= request.userId.email %><br> <b>Username:</b><%= request.userId.username %></p>
                                 <!-- Form to accept request -->
+                                <% if (request.status === 0) { %>
+                                  <button style="height: 2rem; width: 6rem; padding: 0rem;" class="rejectButton btn btn-danger">Rejected</button>
+                              <% } else {%>
                                 <form action="/listings/<%= listing._id %>/<%= request.userId._id %>/accepted" method="POST">
                                     <button style="height: 2rem; width: 6rem; padding: 0rem; margin-right: 0.5rem;" class="acceptButton btn btn-success">Accept</button>
                                 </form>
@@ -201,19 +205,37 @@
                                 <form action="/listings/<%= listing._id %>/<%= request.userId._id %>/rejected" method="POST">
                                     <button style="height: 2rem; width: 6rem; padding: 0rem;" class="rejectButton btn btn-danger">Reject</button>
                                 </form>
+                                 <% } %>
+                                
                             </div>
                         <% }); %>
                         <% } %>
-                        <% if (( currUser && listing.owner._id.equals(currUser._id ) )&& listing.AcceptStatus == 1) { %>
-                            <!-- Display purchaser information -->
-                            <p class="RequestedBy"><u><b>Purchased By</b></u></p>
-                                <div class="RequestedBy">
-                                    <p><b>Phone Number:</b> <%= listing.RequestedBy[0].phoneNumber %></p>
-                                    <p><b>Username:</b> <%= listing.RequestedBy[0].userId.username %></p>
-                                    <p><b>Email:</b> <%= listing.RequestedBy[0].userId.email %></p>
-                                    <!-- Add other purchase details as needed -->
-                                </div>
-                        <% } %>
+                        <% if (currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus == 1) { %>
+                          <!-- Display purchaser information -->
+                          <p class="RequestedBy"><u><b>Purchased By</b></u></p>
+                          <div class="RequestedBy">
+                              <% listing.RequestedBy.forEach(request => { %>
+                                  <% if (request.status === 1) { %>
+                                      <p><b>Username:</b> <%= request.userId.username %></p>
+                                      <p><b>Email:</b> <%= request.userId.email %></p>
+                                      <p><b>Phone Number:</b> <%= request.phoneNumber %></p>
+                                      <%
+                                      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                                      
+                                      const date = new Date(request.purchaseDate);
+                                      const day = date.getDate();
+                                      const monthIndex = date.getMonth();
+                                      const year = date.getFullYear();
+                                      
+                                      const formattedDate = `${day} ${months[monthIndex]} ${year}`;
+                                      %>
+                                      
+                                      <p><b>Date:</b> <%= formattedDate %></p>
+                                      <!-- Add other purchase details as needed -->
+                                  <% } %>
+                              <% }) %>
+                          </div>
+                      <% } %>                      
                          </div>
                       </div>
                       </div>
@@ -239,124 +261,115 @@
               </div>
               </div>
               <br>
-              
-                <% if (currUser && !listing.owner._id.equals(currUser._id) && listing.AcceptStatus == 0) { %>
-                  <form  action="/listings/<%=listing._id%>/purchaseReq" method="POST">
+              <!-- requested.userId.equals(currUser._id) && -->
+
+              <% if (currUser && !listing.owner._id.equals(currUser._id) && listing.AcceptStatus == 0 && listing.status === 0) { %>
+                <form action="/listings/<%= listing._id %>/purchaseReq" method="POST">
                     <button id="myBtn">Purchase</button>
+            
                     <!-- The Modal -->
                     <div id="myModal" class="modal">
-                    
-                      <!-- Modal content -->
-                      <div class="modal-content">
-                        <span class="close">&times;</span>
-                        <form>
-                          <div class="mb-3">
-                            <p style="color: red;"> Please provide phone number so that we can initiate your request to the owner!</p>
-                            <label for="contact" class="form-label">Phone Number</label>
-                            <input name="phoneNumber" type="text" class="form-control" id="contact" placeholder="Enter phone number (e.g., +1234567890)" required>
-                            <div class="invalid-feedback" id="phoneErrorMessage">Please enter a valid phone number</div>
+                        <!-- Modal content -->
+                        <div class="modal-content">
+                            <span class="close">&times;</span>
+                            <div class="mb-3">
+                                <p style="color: red;">Please provide a phone number so that we can initiate your request to the owner!</p>
+                                <label for="contact" class="form-label">Phone Number</label>
+                                <input name="phoneNumber" type="text" class="form-control" id="contact" placeholder="Enter phone number (e.g., +1234567890)" required>
+                                <div class="invalid-feedback" id="phoneErrorMessage">Please enter a valid phone number</div>
+                            </div>
+                            <button type="submit">Submit</button>
                         </div>
-                    <button type="submit">Submit</button>
-                        </form>
-                      </div>
                     </div>
-                    </form>
+                </form>
                 <br>
-              <% } %>
-              <% if(currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
-              <div style="margin-left:9rem;" class="btns">
-                  <a style="width: 5rem" class="btn btn-dark col-1 offset-3 add-btn"  href="/listings/<%=listing._id%>/edit">Edit</a>
-                  <form method="post"  action="/listings/<%=listing._id%>/delete?_method=DELETE">
-                  <button class="btn btn-dark offset-4">Delete</button>
-                  </form>
+            <% } %>
+            
+            <% if (currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
+                <div style="margin-left: 9rem;" class="btns">
+                    <a style="width: 5rem" class="btn btn-dark col-1 offset-3 add-btn" href="/listings/<%= listing._id %>/edit">Edit</a>
+                    <form method="POST" action="/listings/<%= listing._id %>/delete?_method=DELETE">
+                        <button class="btn btn-dark offset-4">Delete</button>
+                    </form>
                 </div>
-                <% }%>
-                <% if(currUser && !listing.owner._id.equals(currUser._id)) { %>
-                
-                <div style="margin-left: 33rem;" class="col-8 offset-3">
-                  <!-- <hr> -->
-                  <h4>Leave a Review</h4>
-                  <form action="/listings/<%=listing._id%>/reviews" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
-                      <!-- <lable class="form-label" for="rating">Rating</lable>
-                      <input type="range" min="1" max="5" id="rating" name="review[rating]" class="form-range"> -->
-                    <div class="mb-3 mt-3">
-                      <label for="rating" class="form-label"><b>Rating</b></label>
-  
-                    <fieldset class="starability-slot">
-                      <input 
-                            type="radio" 
-                            id="no-rate" 
-                            class="input-no-rate"
-                            name="review[rating]" 
-                            value="1"
-                            checked aria-label="No rating."
-                            />
-                      <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-                      <label for="first-rate1" title="Terrible">1 star</label>
-                      <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-                      <label for="first-rate2" title="Not good">2 stars</label>
-                      <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-                      <label for="first-rate3" title="Average">3 stars</label>
-                      <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-                      <label for="first-rate4" title="Very good">4 stars</label>
-                      <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-                      <label for="first-rate5" title="Amazing">5 stars</label>
-                    </fieldset>
-                  </div>
-                    <div class="mb-3 mt-3">
-                      <lable class="form-label" for="comment"><b>Comments</b></lable>
-                      <textarea style="height: 7rem;width: 29rem;" name="review[comment]" id="comment" cols="10" rows="5" class="form-control" required></textarea>
-                      <p> Attach some images</p><input name="review[image]" type="file" multiple>
-                      <div class="invalid-feedback">
-                        Please submit some comments for reviews
-                      </div>
-                    </div>
-                    <br>
-                    <button class="btn btn-outline-dark">Submit</button>
-                  </form>
-                  <hr>
-                  <% } %>
-                
-             <%if(listing.reviews.length > 0){ %>
-  
-              <div class="row ">
-                <h4>All Reviews</h4>
-                 <% for(review of listing.reviews) {%>
-                   <div class="card col-8  ms-3 mb-3">
-                     <div class="card-body" style="padding: 1rem;" >
-                         <div class="rev" style="display: flex;">
-                          <div class="card-title"> <b><%= review.author.username %></b></div>  <div style="margin-left: 20rem;" class="starability-result card-text" data-rating ="<%= review.rating %>">
-                          </div><br> 
-                         
-                         </div>
-                        <div class="imgReview">
-                          <% for (let image of review.image) { %>
-                            <img  style="height: 5rem; width: 5rem; border-radius: 0.3rem;" src="/uploads/<%= image %>" alt="review_image">
-                          </div>
-                        <% } %>
+            <% } %>
+            
+            <div style="margin-left: -3rem;">
+                <% if (currUser && !listing.owner._id.equals(currUser._id)) { %>
+                    <div style="margin-left: 20rem;" class="col-8 offset-3">
+                        <div style="margin-left: 11rem;">
+                            <h4>Leave a Review</h4>
+                            <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation" enctype="multipart/form-data">
+                                <div class="mb-3 mt-3">
+                                    <label for="rating" class="form-label"><b>Rating</b></label>
+                                    <fieldset class="starability-slot">
+                                        <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                                        <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                                        <label for="first-rate1" title="Terrible">1 star</label>
+                                        <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                                        <label for="first-rate2" title="Not good">2 stars</label>
+                                        <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                                        <label for="first-rate3" title="Average">3 stars</label>
+                                        <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                                        <label for="first-rate4" title="Very good">4 stars</label>
+                                        <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                                        <label for="first-rate5" title="Amazing">5 stars</label>
+                                    </fieldset>
+                                </div>
+                                <div class="mb-3 mt-3">
+                                    <label class="form-label" for="comment"><b>Comments</b></label>
+                                    <textarea style="height: 7rem;width: 29rem;" name="review[comment]" id="comment" cols="10" rows="5" class="form-control" required></textarea>
+                                    <p>Attach some images</p>
+                                    <input name="review[image]" type="file" multiple>
+                                    <div class="invalid-feedback">Please submit some comments for reviews</div>
+                                </div>
+                                <br>
+                                <button class="btn btn-outline-dark">Submit</button>
+                            </form>
+                            <hr>
                         </div>
-                        <p class="card-text"><%=review.comment%></p>
-                         
-                   </div>
-                   <% if(currUser && review.author._id.equals(currUser._id)) { %>
-                   <form class="mb-3" method="POST" action="/listings/<%=listing._id%>/reviews/<%=review._id%>?_method=DELETE">
-                     <button style="margin-left: 0.5rem;" class="btn btn-sm btn-dark">Delete</button>
-                   </form>
-                   <% }%>
-                   </div><br>
+                    </div>
                 <% } %>
-               </div>
-  
-              <%}%>
+            
+                <div style="margin-left: 33em;">
+                    <% if (listing.reviews.length > 0) { %>
+                        <div class="row">
+                            <h4><b><br>All Reviews</b></h4>
+                            <% listing.reviews.forEach(function (review) { %>
+                                <div style="margin-left: 14rem;" class="card col-6 ms-4 mb-3">
+                                    <div style="margin-top: 0.3rem;" class="card-body" style="padding: 1rem;">
+                                        <div class="rev d-flex align-items-center">
+                                            <div style="margin-left: 0.5rem;" class="card-title">
+                                                <b>@<%= review.author.username %></b>
+                                            </div>
+                                            <div style="margin-left: 15rem; margin-top: 0.3rem; margin-bottom: 1rem;" class="starability-result card-text" data-rating="<%= review.rating %>"></div>
+                                            <br>
+                                        </div>
+                                        <div style="margin-left: 1rem;" class="imgReview">
+                                            <% review.image.forEach(function (image) { %>
+                                                <img style="height: 5rem; width: 5rem; border-radius: 0.3rem; margin-right: 0.5rem;" src="/uploads/<%= image %>" alt="review_image">
+                                            <% }) %>
+                                        </div>
+                                        <p style="margin: 0.5rem 0.2rem 0.1rem 0.4rem;" class="card-text"><%= review.comment %></p>
+                                    </div>
+                                    <% if (currUser && (review.author._id.equals(currUser._id) || listing.owner._id.equals(currUser._id))) { %>
+                                        <form class="mb-3" method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                            <button style="margin-left: 0.5rem; margin-top: 0.5rem;" class="btn btn-sm btn-dark">Delete</button>
+                                        </form>
+                                    <% } %>
+                                </div>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
             </div>
-          <!-- </div> -->
-          
-              <br>
-              <div style="margin-left: 33rem;" class="col-8 offset-3 mb-3">
+            <br>
+            <div class="col-8 offset-4 mb-3">
                 <h3>Location Insight</h3>
                 <div id="map"></div>
-              </div>
             </div>
+            
+                
             <script src="/js/map.js" ></script>
             <script>
               var modal = document.getElementById("myModal");
@@ -377,7 +390,8 @@
                   modal.style.display = "none";
                 }
               }
-              document.addEventListener('DOMContentLoaded', function () {
+
+            document.addEventListener('DOMContentLoaded', function () {
             // Replace the listing.Date string with the actual date value from your EJS template
             const dateString = '<%= listing.Date %>';
             const date = new Date(dateString);
@@ -395,6 +409,7 @@
             document.getElementById('dateDisplay').innerText = formattedDate;
         });
 
+        
             </script>
                 
       
