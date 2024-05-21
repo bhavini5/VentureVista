@@ -22,12 +22,6 @@ const User=require("./models/user.js");
 const multer=require("multer");
 const upload=multer({dest:'uploads/'});
 // const { uploadProcessedData } = require("./firebase.js");
-const cors = require('cors');
-const corsOptions = {
-    origin: 'https://venturevista-hwny.onrender.com',
-    credentials: true, // Allows cookies to be sent with requests
-};
-app.use(cors(corsOptions));
 
 
 
@@ -94,19 +88,17 @@ store.on("error" , ()=>{
     console.log("error in mongo session store",err);
 })
 const sessionOptions = {
-    store: new MongoStore({ url: process.env.ATLASDB_URL }), // Use your MongoDB URI
+    store,
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     cookie: {
-        expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
-        httpOnly: true, // Prevents client-side JS from accessing the cookie
-        secure: process.env.NODE_ENV === 'production', // Ensures the cookie is sent only over HTTPS in production
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // Sets the expiration time for the cookie to one week from now.
+        maxAge: 7 * 24 * 60 * 60 * 1000, // Sets the maximum age of the cookie to one week.
+        secure: true // Ensures the cookie is only sent over HTTPS.
     }
 };
 
-app.use(session(sessionOptions));
 
 
 
@@ -176,8 +168,7 @@ app.all("*", (req, res,next) => {
     res.render("listings/error.ejs")
 });
 
-const port = process.env.PORT || 4000;
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
+const PORT = 8081;
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
