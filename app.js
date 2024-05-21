@@ -75,7 +75,7 @@ app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"public")));
 app.use('/uploads', express.static('uploads'));
 
-const {saveRedirectUrl,isLoggedIn}=require("../middleware.js")
+const {saveRedirectUrl,isLoggedIn}=require("./middleware.js")
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
