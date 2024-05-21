@@ -23,6 +23,7 @@ const multer=require("multer");
 const upload=multer({dest:'uploads/'});
 // const { uploadProcessedData } = require("./firebase.js");
 
+const Listing = require("../models/listing.js");
 
 
 const listingsRouter= require("./routes/listing.js");
