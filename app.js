@@ -114,42 +114,6 @@ passport.serializeUser(User.serializeUser()); //generates function that is used 
 passport.deserializeUser(User.deserializeUser()); //generates function that is used by passport to deserialize(unstore/remove) users into session(logout)
 
 
-app.get("/signup",(req,res)=>{
-    res.render("users/signup.ejs");
-})
-
-app.post("/signup",async(req,res)=>{
-    try{
-        let {username,email,password}=req.body;
-    const newUser=new User({email,username});
-    const registeredUser=await User.register(newUser,password);
-    // console.log(registeredUser);
-    req.login(registeredUser,(err)=>{
-        if(err){
-            return next (err);
-        }
-        req.flash("success","welcome to VentureVista");
-        res.redirect("/listings")
-    })
-   
-    }
-    catch(e){
-        req.flash("error",e.message);
-        res.redirect("/signup")
-    }
-})
-
-    app.get("/logout",(req, res)=>{
-        req.logout((err)=>{ //take cb as parameter ki logout k bad kya hona chahiye
-            if(err){
-                return next (err);
-            }
-            req.flash("success","you are loged out")
-            res.redirect("/listings");
-        }  )   
-    })
-
-
 
 app.use((req,res,next)=>{
     res.locals.success=req.flash("success");
