@@ -30,6 +30,7 @@ const reviewsRouter= require("./routes/review.js");
 const userRouter= require("./routes/user.js");
 const Listing = require("./models/listing.js");
 
+const port = process.env.PORT || 4000;
 
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
