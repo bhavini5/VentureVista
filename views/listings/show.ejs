@@ -219,18 +219,7 @@
                                       <p><b>Username:</b> <%= request.userId.username %></p>
                                       <p><b>Email:</b> <%= request.userId.email %></p>
                                       <p><b>Phone Number:</b> <%= request.phoneNumber %></p>
-                                      <%
-                                      const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                                      
-                                      const date = new Date(request.purchaseDate);
-                                      const day = date.getDate();
-                                      const monthIndex = date.getMonth();
-                                      const year = date.getFullYear();
-                                      
-                                      const formattedDate = `${day} ${months[monthIndex]} ${year}`;
-                                      %>
-                                      
-                                      <p><b>Date:</b> <%= formattedDate %></p>
+                                      <p><b>Date:</b> <span id="dateDisplay"></span></p>
                                       <!-- Add other purchase details as needed -->
                                   <% } %>
                               <% }) %>
@@ -371,6 +360,25 @@
                 </div>
             </div>
             <br>
+            <script>
+              document.addEventListener('DOMContentLoaded', function () {
+          // Replace the listing.Date string with the actual date value from your EJS template
+          const dateString = '<%= listing.Date %>';
+          const date = new Date(dateString);
+          
+          // Options for date formatting excluding time
+          const options = { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric'
+          };
+          
+          // Format the date
+          const formattedDate = date.toLocaleDateString('en-US', options);
+          document.getElementById('dateDisplay').innerText = formattedDate;
+      });
+            </script>
             <!-- <div class="col-8 offset-4 mb-3">
                 <h3>Location Insight</h3>
                 <div id="map"></div>
