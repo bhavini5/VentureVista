@@ -45,15 +45,15 @@
         <div class="navbar-nav ms-auto"> 
           <!-- ms-auto means right m shift k lie  -->
           <a class="nav-link" href="/listings/new">Rental your Property</a>
-          <a class="nav-link" href="/my_properties">Your Properties</a>
-          <a class="nav-link" href="/requested/properties"> Pending Requests</a>
+          <a class="nav-link" href="/user/my_properties">Your Properties</a>
+          <a class="nav-link" href="/user/requested/properties"> Pending Requests</a>
           <!-- <a class="nav-link" href="/history"> History </a> -->
 
           <% if (!currUser) {%>
             <a class="nav-link active" aria-current="page" href="/signup"><b>Sign Up</b></a>
-          <a class="nav-link" href="/login"><b>Log in</b></a>
+          <a class="nav-link" href="/user/login"><b>Log in</b></a>
           <% } %> <% if(currUser) {%> 
-          <a class="nav-link" href="/logout"><b>Log out</b></a>
+          <a class="nav-link" href="/user/logout"><b>Log out</b></a>
              <%}  %>
         </div>
       </div>
