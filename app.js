@@ -87,17 +87,18 @@ const store = MongoStore.create({
 store.on("error" , ()=>{
     console.log("error in mongo session store",err);
 })
-const sessionOptions= {
+const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUnintialized: true,
-    cookie:{
-        expires:Date.now()+7 * 24 * 60 * 60 * 1000,
-        maxAge:7 * 24 * 60 * 60 * 1000,
-        httpsOnly:true //security purpose, cross Scripting attacks se bachne k lie
+    saveUninitialized: true,
+    cookie: {
+        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // Sets the expiration time for the cookie to one week from now.
+        maxAge: 7 * 24 * 60 * 60 * 1000, // Sets the maximum age of the cookie to one week.
+        secure: true // Ensures the cookie is only sent over HTTPS.
     }
-}
+};
+
 
 
 
