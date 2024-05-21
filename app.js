@@ -76,6 +76,7 @@ app.engine("ejs",ejsMate);
 app.use(express.static(path.join(__dirname,"public")));
 app.use('/uploads', express.static('uploads'));
 
+const {saveRedirectUrl,isLoggedIn}=require("../middleware.js")
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
@@ -114,30 +115,55 @@ passport.serializeUser(User.serializeUser()); //generates function that is used 
 passport.deserializeUser(User.deserializeUser()); //generates function that is used by passport to deserialize(unstore/remove) users into session(logout)
 
 
-// app.use(cookieParser("2#B!APS5t#W"));
+app.get("/signup",(req,res)=>{
+    res.render("users/signup.ejs");
+})
 
-// app.get("/getsignedcookies",(req,res)=>{
-//     res.cookie("greet","namaste",{signed:true});
-    
-//     res.send("send you some signedcookies!")
+app.post("/signup",async(req,res)=>{
+    try{
+        let {username,email,password}=req.body;
+    const newUser=new User({email,username});
+    const registeredUser=await User.register(newUser,password);
+    // console.log(registeredUser);
+    req.login(registeredUser,(err)=>{
+        if(err){
+            return next (err);
+        }
+        req.flash("success","welcome to VentureVista");
+        res.redirect("/listings")
+    })
+   
+    }
+    catch(e){
+        req.flash("error",e.message);
+        res.redirect("/signup")
+    }
+})
+app.get("/login",(req,res)=>{
+    res.render("users/login.ejs");
+})
 
-// })//puri value change={} if value changes=false printed
-// app.get("/verify",(req,res)=>{
-//     console.log(req.signedCookies);
-//     res.send("verified");
-// })
-// app.get("/getcookies",(req,res)=>{
-//     res.cookie("greet","namaste");
-//     res.cookie("madeIn","India");
-//     res.send("send you some cookies!")
+app.post("/login",saveRedirectUrl,
+    passport.authenticate("local",{
+        failureRedirect:'/login' ,
+        failureFlash:true ,
+    }) ,
+    async(req,res)=>{
+        req.flash("success","Welcome back to VentureVista");
+        let redirectUrl=res.locals.redirectUrl || "/listings";
+        res.redirect(redirectUrl); // res.locals.redirectUrl function is defined in url 
+    })
 
-// })
+    app.get("/logout",(req, res)=>{
+        req.logout((err)=>{ //take cb as parameter ki logout k bad kya hona chahiye
+            if(err){
+                return next (err);
+            }
+            req.flash("success","you are loged out")
+            res.redirect("/listings");
+        }  )   
+    })
 
-
-// app.get("/", (req, res) => {
-//     console.dir(req.cookies);
-//     res.send("hi i am root");
-// });
 
 
 app.use((req,res,next)=>{

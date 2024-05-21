@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
         allListings,
         count1,
         count2,
-        user: req.user || { username: 'Guest' } // Provide a default user object if req.user is undefined
+        user: req.user || { username: 'Guest' } 
     });
     } catch (error) {
       console.error(error);
