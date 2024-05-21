@@ -9,7 +9,7 @@ const {saveRedirectUrl,isLoggedIn}=require("../middleware.js")
 const Listing = require("../models/listing.js");
 
 router.get("/signup",(req,res)=>{
-    res.render("user/signup.ejs");
+    res.render("users/signup.ejs");
 })
 
 router.post("/signup",async(req,res)=>{
@@ -23,7 +23,6 @@ router.post("/signup",async(req,res)=>{
             return next (err);
         }
         req.flash("success","welcome to VentureVista");
-        console.log(newUser);
         res.redirect("/listings")
     })
    
@@ -43,6 +42,8 @@ router.post("/login",saveRedirectUrl,
         failureFlash:true ,
     }) ,
     async(req,res)=>{
+        // console.log(req.user);
+
         req.flash("success","Welcome back to VentureVista");
         let redirectUrl=res.locals.redirectUrl || "/listings";
         res.redirect(redirectUrl); // res.locals.redirectUrl function is defined in url 

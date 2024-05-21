@@ -64,13 +64,14 @@ const {saveRedirectUrl,isLoggedIn}=require("./middleware.js")
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
-    crypto:{
+    crypto :{
         secret: process.env.SECRET,
-    },
-    touchAfter: 24 * 3600,
-})
+    } ,// Specify the session signing secret directly here
+    touchAfter: 24 * 3600 // Optional: Adjust the session touch interval if needed
+});
 
-store.on("error" , ()=>{
+
+store.on("error" , (err)=>{
     console.log("error in mongo session store",err);
 })
 const sessionOptions = {
@@ -81,11 +82,9 @@ const sessionOptions = {
     cookie: {
         expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // Sets the expiration time for the cookie to one week from now.
         maxAge: 7 * 24 * 60 * 60 * 1000, // Sets the maximum age of the cookie to one week.
-        secure: true // Ensures the cookie is only sent over HTTPS.
+        httpOnly:true
     }
 };
-
-
 
 
 app.use(session(sessionOptions));
