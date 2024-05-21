@@ -43,7 +43,7 @@ router.get("/new", isLoggedIn, (req, res) => {
 router.post("/upload",
     isLoggedIn,
     // validateListing,
-    upload.array("listing[image]",5), // Handle multiple file uploads
+    upload.array("listing[image]",10), // Handle multiple file uploads
     wrapAsync(async (req, res, next) => {
        
         // console.log(req.file);

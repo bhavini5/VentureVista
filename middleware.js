@@ -15,7 +15,7 @@ module.exports.isLoggedIn=(req,res,next)=>{
         //redirect url save here
         req.session.redirectUrl=req.originalUrl; //req k andr kafi kuchh store hota h properties 
         req.flash("error","you must be logged in to create listing!");
-        return res.redirect("/login");
+        return res.redirect("/user/login");
     }
     next();
 }
