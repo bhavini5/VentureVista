@@ -30,7 +30,6 @@ const reviewsRouter= require("./routes/review.js");
 const userRouter= require("./routes/user.js");
 const Listing = require("./models/listing.js");
 
-const port = process.env.PORT || 4000;
 
 
 // const MONGO_URL = "mongodb://127.0.0.1:27017/wanderlust";
@@ -169,7 +168,8 @@ app.all("*", (req, res,next) => {
     res.render("listings/error.ejs")
 });
 
-const PORT = 8081;
+const port = process.env.PORT || 4000;
+
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`Server is running on port ${port}`);
 });
