@@ -146,9 +146,7 @@ app.use((req,res,next)=>{
     next();
 })
 
-const listingsRouter = require('./routes/listings');
-const reviewsRouter = require('./routes/reviews');
-const userRouter = require('./routes/user');
+
 
 // Mount the routers with their respective paths
 app.use('/listings', listingsRouter);
