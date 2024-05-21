@@ -9,7 +9,7 @@ const {saveRedirectUrl,isLoggedIn}=require("../middleware.js")
 const Listing = require("../models/listing.js");
 
 router.get("/signup",(req,res)=>{
-    res.render("users/signup.ejs");
+    res.render("user/signup.ejs");
 })
 
 router.post("/signup",async(req,res)=>{

@@ -23,7 +23,6 @@ const multer=require("multer");
 const upload=multer({dest:'uploads/'});
 // const { uploadProcessedData } = require("./firebase.js");
 
-const Listing = require("../models/listing.js");
 
 
 const listingsRouter= require("./routes/listing.js");
@@ -115,54 +114,7 @@ passport.serializeUser(User.serializeUser()); //generates function that is used 
 passport.deserializeUser(User.deserializeUser()); //generates function that is used by passport to deserialize(unstore/remove) users into session(logout)
 
 
-app.get("/signup",(req,res)=>{
-    res.render("users/signup.ejs");
-})
 
-app.post("/signup",async(req,res)=>{
-    try{
-        let {username,email,password}=req.body;
-    const newUser=new User({email,username});
-    const registeredUser=await User.register(newUser,password);
-    // console.log(registeredUser);
-    req.login(registeredUser,(err)=>{
-        if(err){
-            return next (err);
-        }
-        req.flash("success","welcome to VentureVista");
-        res.redirect("/listings")
-    })
-   
-    }
-    catch(e){
-        req.flash("error",e.message);
-        res.redirect("/signup")
-    }
-})
-app.get("/login",(req,res)=>{
-    res.render("users/login.ejs");
-})
-
-app.post("/login",saveRedirectUrl,
-    passport.authenticate("local",{
-        failureRedirect:'/login' ,
-        failureFlash:true ,
-    }) ,
-    async(req,res)=>{
-        req.flash("success","Welcome back to VentureVista");
-        let redirectUrl=res.locals.redirectUrl || "/listings";
-        res.redirect(redirectUrl); // res.locals.redirectUrl function is defined in url 
-    })
-
-    app.get("/logout",(req, res)=>{
-        req.logout((err)=>{ //take cb as parameter ki logout k bad kya hona chahiye
-            if(err){
-                return next (err);
-            }
-            req.flash("success","you are loged out")
-            res.redirect("/listings");
-        }  )   
-    })
 
 
 
