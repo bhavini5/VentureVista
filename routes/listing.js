@@ -59,7 +59,7 @@ router.post("/upload",
         // console.log(url, filename);
 
         const newListing = new Listing(req.body.listing);
-        console.log(newListing.category);
+        // console.log(newListing.category);
         newListing.owner=req.user._id;
         newListing.image=filenames;
         newListing.geometry=response.body.features[0].geometry;
@@ -89,7 +89,7 @@ router.get("/:id",isLoggedIn, async (req, res) => {
         }
     })
     .populate("owner")
-    console.log(listing);
+    // console.log(listing);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings"); // Add return statement here
@@ -109,7 +109,7 @@ router.get("/:id/requested",isLoggedIn, async (req, res) => {
     
     .populate("reviews")
     .populate("owner");
-    console.log(listing);
+    // console.log(listing);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings"); // Add return statement here
@@ -171,7 +171,7 @@ router.get("/search/:key", async (req, res) => {
             ]
         });
 
-        console.log(data);
+        // console.log(data);
         if(data.length){
             res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
         }
@@ -204,7 +204,7 @@ router.get("/sort/:sortBy", async (req, res) => {
         }
 
         const data = await Listing.find({AcceptStatus: 0}).sort(sortCriteria);
-        console.log(data);
+        // console.log(data);
         res.render("listings/index.ejs", { allListings: data,count1,count2 ,user: req.user || { username: 'Guest' }});
     } catch (error) {
         console.error(error);
@@ -229,7 +229,7 @@ router.get('/filter/Sell', async (req, res) => {
         const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
         const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
     let data = await Listing.find({category : "Sell",AcceptStatus: 0 });
-    console.log(data);
+    // console.log(data);
     if(data.length){
         res.render("listings/index.ejs", { allListings: data,count1,count2,user: req.user || { username: 'Guest' } });
     }
