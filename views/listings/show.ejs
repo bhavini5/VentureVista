@@ -265,6 +265,12 @@
 
               <% if (currUser && !listing.owner._id.equals(currUser._id) && listing.AcceptStatus == 0 && listing.status === 0) { %>
                 <form action="/listings/<%= listing._id %>/purchaseReq" method="POST">
+                  <% const requestedByCurrentUser = listing.RequestedBy.some(entry => entry.userId.equals(currUser._id)); %>
+                <% if(listing.AcceptStatus === 0 && requestedByCurrentUser) { %>
+                  <div style="width: fit-content; margin-left: 33rem;" class="alert alert-danger " role="alert">
+                    Requested By You
+                  </div>
+            <%    } else{ %>
                     <button id="myBtn">Purchase</button>
             
                     <!-- The Modal -->
@@ -283,6 +289,7 @@
                     </div>
                 </form>
                 <br>
+            <% } %>
             <% } %>
             
             <% if (currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
