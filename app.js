@@ -50,22 +50,7 @@ async function main() {
 }
 
 main(); 
-// async function functionName() {
-//     // Asynchronous code here
-//     // You can use await to pause execution until a promise is resolved
-// }
 
-// async (req, res) => {
-//     const allListings = await Listing.find({})
-//     // console.log(allListings)
-//     res.render("listings/index.ejs", { allListings });
-// };
-
-// async function getDatafromdatabase()
-// {
-//     let listing = await Listing.find({});
-//     console.log(listing);
-// }
 
 app.set("view engine","ejs");
 app.set("views", path.join(__dirname, "views"));
@@ -83,6 +68,7 @@ const store = MongoStore.create({
         secret: process.env.SECRET,
     },
     touchAfter: 24 * 3600,
+    collectionName: 'mySessions'
 })
 
 store.on("error" , ()=>{
@@ -92,11 +78,11 @@ const sessionOptions = {
     store,
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false, // Usually better to be false for security
     cookie: {
-        expires: Date.now() + 7 * 24 * 60 * 60 * 1000, // Sets the expiration time for the cookie to one week from now.
-        maxAge: 7 * 24 * 60 * 60 * 1000, // Sets the maximum age of the cookie to one week.
-        secure: true // Ensures the cookie is only sent over HTTPS.
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 1 week
+        secure: process.env.NODE_ENV === 'production', // Set to true in production
+        httpOnly: true // Helps prevent XSS
     }
 };
 
@@ -149,7 +135,11 @@ app.get("/",async(req,res)=>{
       res.status(500).send("Internal Server Error");
     }
 })
-
+app.use((req, res, next) => {
+    console.log('Session:', req.session);
+    console.log('User:', req.user);
+    next();
+});
 app.use((err, req, res, next) => {
     let { statusCode =500,message ="something went wrong" } = err;
     res.status(statusCode).send(message);
