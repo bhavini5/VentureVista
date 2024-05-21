@@ -170,6 +170,6 @@ app.all("*", (req, res,next) => {
 
 const port = process.env.PORT || 4000;
 
-app.listen(PORT, () => {
+app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
