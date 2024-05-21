@@ -23,6 +23,7 @@ router.post("/signup",async(req,res)=>{
             return next (err);
         }
         req.flash("success","welcome to VentureVista");
+        console.log(newUser);
         res.redirect("/listings")
     })
    
