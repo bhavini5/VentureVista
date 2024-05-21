@@ -157,9 +157,21 @@ app.use('/user', userRouter);
 //post-route
 
 app.get("/",async(req,res)=>{
-    const allListings = await Listing.find({})
-    // console.log(allListings)
-    res.render("listings/index.ejs", { allListings });
+    try {
+        // console.log(req.user);
+      const allListings = await Listing.find({AcceptStatus: 0});
+      const count1 = await Listing.countDocuments({ category: 'Sell',AcceptStatus:1 });
+      const count2 = await Listing.countDocuments({ category: 'Rental',AcceptStatus:1  });
+      res.render("listings/index.ejs", {
+        allListings,
+        count1,
+        count2,
+        user: req.user || { username: 'Guest' } // Provide a default user object if req.user is undefined
+    });
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+    }
 })
 
 app.use((err, req, res, next) => {
