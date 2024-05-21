@@ -145,9 +145,15 @@ app.use((req,res,next)=>{
     res.locals.currUser=req.user;
     next();
 })
-app.use("/listings",listingsRouter);
-app.use("/listings/:id/reviews",reviewsRouter)
-app.use("/",userRouter)
+
+const listingsRouter = require('./routes/listings');
+const reviewsRouter = require('./routes/reviews');
+const userRouter = require('./routes/user');
+
+// Mount the routers with their respective paths
+app.use('/listings', listingsRouter);
+app.use('/listings/:id/reviews', reviewsRouter);
+app.use('/user', userRouter);
 
 //reviews
 //post-route
