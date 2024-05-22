@@ -89,7 +89,7 @@ router.get("/:id",isLoggedIn, async (req, res) => {
         }
     })
     .populate("owner")
-    console.log(listing);
+    // console.log(listing);
     if (!listing) {
         req.flash("error", "Listing you requested for does not exist!");
         return res.redirect("/listings"); // Add return statement here
@@ -327,7 +327,7 @@ router.post('/:id/purchaseReq', isLoggedIn, async (req, res) => {
                 phoneNumber: phoneNumber,
                 status: 1
             });
-
+            listing.status = 1;
             await listing.save(); // Save the listing
             res.redirect("/listings");
         } else {

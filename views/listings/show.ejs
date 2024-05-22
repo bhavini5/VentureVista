@@ -188,7 +188,7 @@
                 <!-- Output listing status for debugging -->
               
                 <div class="requestBox">
-                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.AcceptStatus === 1 ) { %>
+                    <% if (currUser && listing.owner._id.equals(currUser._id)  && listing.status === 0 ) { %>
                         <!-- Display requests if the listing is for sale and has requests -->
                         <p class="requests">All Requests</p> 
                         <% listing.RequestedBy.forEach(request => { %>
