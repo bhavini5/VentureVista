@@ -398,7 +398,7 @@ router.post("/:id/:Currid/accepted", isLoggedIn, async (req, res) => {
         await listing.save();
 
         // Redirect or respond with success message
-        res.redirect("/my_properties");
+        res.redirect("/user/my_properties");
     } catch (error) {
         console.error('Error processing purchase request:', error);
         res.status(500).json({ error: 'Internal server error' });
@@ -432,7 +432,7 @@ router.post("/:id/:Currid/rejected", isLoggedIn, async (req, res) => {
         await listing.save();
 
         // Redirect to "/my_properties" on success
-        res.redirect("/my_properties");
+        res.redirect("/user/my_properties");
     } catch (error) {
         // Log and return a 500 internal server error on failure
         console.error('Error processing request:', error);
