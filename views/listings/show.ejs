@@ -259,7 +259,8 @@
                   <div style="width: fit-content; margin-left: 33rem;" class="alert alert-danger " role="alert">
                     Requested By You
                   </div>
-            <%    } else{ %>
+            <%    } %>
+              <% if(listing.AcceptStatus === 0 && !requestedByCurrentUser) { %>
                     <button id="myBtn">Purchase</button>
             
                     <!-- The Modal -->
@@ -276,9 +277,10 @@
                             <button type="submit">Submit</button>
                         </div>
                     </div>
+            <% } %>
+
                 </form>
                 <br>
-            <% } %>
             <% } %>
             
             <% if (currUser && listing.owner._id.equals(currUser._id) && listing.AcceptStatus === 0) { %>
@@ -385,7 +387,7 @@
             </div> -->
             
                 
-            <!-- <script src="/js/map.js" ></script>
+            <!-- <script src="/js/map.js" ></script> -->
             <script>
               var modal = document.getElementById("myModal");
               var btn = document.getElementById("myBtn");
@@ -406,25 +408,25 @@
                 }
               }
 
-            document.addEventListener('DOMContentLoaded', function () {
-            // Replace the listing.Date string with the actual date value from your EJS template
-            const dateString = '<%= listing.Date %>';
-            const date = new Date(dateString);
+        //     document.addEventListener('DOMContentLoaded', function () {
+        //     // Replace the listing.Date string with the actual date value from your EJS template
+        //     const dateString = '<%= listing.Date %>';
+        //     const date = new Date(dateString);
             
-            // Options for date formatting excluding time
-            const options = { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric'
-            };
+        //     // Options for date formatting excluding time
+        //     const options = { 
+        //         weekday: 'long', 
+        //         year: 'numeric', 
+        //         month: 'long', 
+        //         day: 'numeric'
+        //     };
             
-            // Format the date
-            const formattedDate = date.toLocaleDateString('en-US', options);
-            document.getElementById('dateDisplay').innerText = formattedDate;
-        });
+        //     // Format the date
+        //     const formattedDate = date.toLocaleDateString('en-US', options);
+        //     document.getElementById('dateDisplay').innerText = formattedDate;
+        // });
 
         
-            </script> -->
+            </script>
                 
       
